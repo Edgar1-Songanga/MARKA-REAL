@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARKA Super App</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+ --bg:#0b0f14;
+ --card:#121821;
+ --accent:#00e0ff;
+ --text:#fff;
+ --muted:#7a8a9a;
+}
+
+body{margin:0;font-family:Inter;background:var(--bg);color:var(--text);}
+nav{display:flex;gap:10px;padding:10px;background:#000;overflow-x:auto;}
+nav button{background:none;border:none;color:white;cursor:pointer;font-size:13px;}
+
+.container{padding:15px;}
+.hidden{display:none;}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+ gap:12px;
+}
+
+.card{
+ background:var(--card);
+ padding:12px;
+ border-radius:12px;
+ transition:.3s;
+}
+.card:hover{transform:translateY(-4px);}
+
+.btn{
+ background:var(--accent);
+ border:none;
+ padding:8px;
+ border-radius:8px;
+ cursor:pointer;
+ width:100%;
+ margin-top:8px;
+ font-weight:600;
+}
+
+.feed video{
+ width:100%;
+ border-radius:10px;
+ margin-bottom:10px;
+}
+
+.chat-box{
+ height:220px;
+ overflow:auto;
+ background:#000;
+ padding:10px;
+ border-radius:10px;
+}
+
+input{
+ width:100%;
+ padding:10px;
+ margin-top:8px;
+ border-radius:8px;
+ border:none;
+ background:#111;
+ color:white;
+}
+
+.badge{
+ font-size:12px;
+ color:#000;
+ background:var(--accent);
+ padding:3px 6px;
+ border-radius:6px;
+ margin-left:6px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+<button onclick="App.nav('home')">Home</button>
+<button onclick="App.nav('market')">Market</button>
+<button onclick="App.nav('services')">Services</button>
+<button onclick="App.nav('transport')">Transport</button>
+<button onclick="App.nav('feed')">Feed</button>
+<button onclick="App.nav('wallet')">Wallet</button>
+<button onclick="App.nav('chat')">Chat</button>
+</nav>
+
+<div class="container">
+
+<div id="home">
+<h2>Welcome</h2>
+<p>Your all-in-one super app</p>
+</div>
+
+<div id="market" class="hidden"><h2>Marketplace</h2><div class="grid" id="marketList"></div></div>
+
+<div id="services" class="hidden"><h2>Services</h2><div class="grid" id="servicesList"></div></div>
+
+<div id="transport" class="hidden">
+<h2>Transport</h2>
+<button class="btn" onclick="Modules.transport.request()">Request Ride</button>
+<p id="rideStatus"></p>
+</div>
+
+<div id="feed" class="hidden">
+<h2>Feed</h2>
+<div id="feedList"></div>
+</div>
+
+<div id="wallet" class="hidden">
+<h2>Wallet</h2>
+<p>Balance: $<span id="balance"></span></p>
+<div id="walletInfo"></div>
+<button class="btn" onclick="Modules.wallet.add()">Add $100</button>
+</div>
+
+<div id="chat" class="hidden">
+<h2>Chat</h2>
+<div class="chat-box" id="chatBox"></div>
+<input placeholder="Message..." onkeydown="Modules.chat.send(event)">
+</div>
+
+</div>
+
+<script>
+
+// CORE APP
+const App = {
+
+ state: JSON.parse(localStorage.getItem("marka")) || {
+  balance:500,
+  chat:[],
+  activity:0,
+  tier:"Bronze",
+  preferences:{},
+
+  market:[
+   {name:"Car Used",price:4000,cat:"auto"},
+   {name:"Apartment",price:20000,cat:"real"},
+   {name:"iPhone",price:800,cat:"tech"}
+  ],
+
+  services:[
+   {name:"Architect",price:200,cat:"pro"},
+   {name:"Psychologist",price:100,cat:"health"},
+   {name:"Accountant",price:150,cat:"finance"}
+  ],
+
+  feed:[
+   {video:"https://www.w3schools.com/html/mov_bbb.mp4",cat:"tech"},
+   {video:"https://www.w3schools.com/html/movie.mp4",cat:"life"}
+  ]
+ },
+
+ save(){
+  localStorage.setItem("marka",JSON.stringify(this.state));
+ },
+
+ nav(id){
+  document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+ },
+
+ learn(cat){
+  if(!this.state.preferences[cat]) this.state.preferences[cat]=0;
+  this.state.preferences[cat]++;
+  this.state.activity+=10;
+  this.updateTier();
+  this.save();
+ },
+
+ updateTier(){
+  let s=this.state.activity;
+  this.state.tier = s>500?"Elite":s>300?"Gold":s>150?"Silver":"Bronze";
+ },
+
+ sort(items){
+  return items.sort((a,b)=>(this.state.preferences[b.cat]||0)-(this.state.preferences[a.cat]||0));
+ }
+
+};
+
+// MODULES
+const Modules = {
+
+ market:{
+  render(){
+   let el=document.getElementById('marketList');
+   el.innerHTML="";
+   App.sort([...App.state.market]).forEach((p,i)=>{
+    el.innerHTML+=`
+    <div class="card">
+     <h3>${p.name}</h3>
+     <p>$${p.price}</p>
+     <button class="btn" onclick="Modules.market.buy(${i})">Buy</button>
+    </div>`;
+   });
+  },
+
+  buy(i){
+   let items=App.sort([...App.state.market]);
+   let p=items[i];
+   if(App.state.balance>=p.price){
+    App.state.balance-=p.price;
+    App.learn(p.cat);
+    alert("Purchased");
+    Modules.wallet.update();
+   }else alert("No balance");
+  }
+ },
+
+ services:{
+  render(){
+   let el=document.getElementById('servicesList');
+   el.innerHTML="";
+   App.sort([...App.state.services]).forEach((s,i)=>{
+    el.innerHTML+=`
+    <div class="card">
+     <h3>${s.name}</h3>
+     <p>$${s.price}</p>
+     <button class="btn" onclick="Modules.services.hire(${i})">Hire</button>
+    </div>`;
+   });
+  },
+
+  hire(i){
+   let s=App.sort([...App.state.services])[i];
+   App.learn(s.cat);
+   alert("Booked");
+   Modules.wallet.update();
+  }
+ },
+
+ transport:{
+  request(){
+   let el=document.getElementById('rideStatus');
+   el.innerText="Finding driver...";
+   App.learn("transport");
+
+   setTimeout(()=>{
+    el.innerText="Driver arriving 🚗";
+    App.state.activity+=20;
+    App.updateTier();
+    App.save();
+   },2000);
+  }
+ },
+
+ feed:{
+  render(){
+   let el=document.getElementById('feedList');
+   el.innerHTML="";
+   App.sort([...App.state.feed]).forEach(v=>{
+    el.innerHTML+=`
+    <video src="${v.video}" controls autoplay muted loop onclick="App.learn('${v.cat}')"></video>`;
+   });
+  }
+ },
+
+ wallet:{
+  update(){
+   document.getElementById('balance').innerText=App.state.balance;
+   document.getElementById('walletInfo').innerHTML=`
+    <p>Score: ${App.state.activity}</p>
+    <p>Tier: ${App.state.tier} <span class="badge">${App.state.tier}</span></p>`;
+   App.save();
+  },
+
+  add(){
+   App.state.balance+=100;
+   App.state.activity+=5;
+   App.updateTier();
+   this.update();
+  }
+ },
+
+ chat:{
+  send(e){
+   if(e.key==="Enter"){
+    App.state.chat.push(e.target.value);
+    e.target.value="";
+    App.state.activity+=2;
+    App.updateTier();
+    this.render();
+    App.save();
+   }
+  },
+
+  render(){
+   let box=document.getElementById('chatBox');
+   box.innerHTML=App.state.chat.map(m=>`<p>${m}</p>`).join('');
+  }
+ }
+
+};
+
+// INIT
+Modules.market.render();
+Modules.services.render();
+Modules.feed.render();
+Modules.chat.render();
+Modules.wallet.update();
+
+</script>
+
+</body>
+  </html>
