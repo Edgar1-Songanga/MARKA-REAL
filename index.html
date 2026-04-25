@@ -4,314 +4,314 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MARKA Super App</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
- --bg:#0b0f14;
- --card:#121821;
- --accent:#00e0ff;
+ --bg:#05070f;
+ --card:rgba(255,255,255,0.04);
+ --border:rgba(255,255,255,0.08);
+ --accent:#00f0ff;
+ --accent2:#8b5cf6;
  --text:#fff;
- --muted:#7a8a9a;
+ --muted:#9aa4b2;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Inter;background:#000;color:var(--text);overflow-x:hidden;}
+
+nav{
+ position:fixed;bottom:0;width:100%;
+ display:flex;justify-content:space-around;
+ padding:10px;background:rgba(0,0,0,0.7);
+ backdrop-filter:blur(12px);border-top:1px solid var(--border);
 }
 
-body{margin:0;font-family:Inter;background:var(--bg);color:var(--text);}
-nav{display:flex;gap:10px;padding:10px;background:#000;overflow-x:auto;}
-nav button{background:none;border:none;color:white;cursor:pointer;font-size:13px;}
+nav button{
+ background:none;border:none;color:var(--muted);
+ font-size:12px;cursor:pointer;
+}
 
-.container{padding:15px;}
+.container{padding:12px;padding-bottom:80px;}
+
 .hidden{display:none;}
-
-.grid{
- display:grid;
- grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
- gap:12px;
-}
 
 .card{
  background:var(--card);
- padding:12px;
- border-radius:12px;
- transition:.3s;
+ border:1px solid var(--border);
+ border-radius:14px;padding:14px;margin-bottom:10px;
 }
-.card:hover{transform:translateY(-4px);}
 
 .btn{
- background:var(--accent);
- border:none;
- padding:8px;
- border-radius:8px;
- cursor:pointer;
- width:100%;
- margin-top:8px;
- font-weight:600;
+ margin-top:10px;padding:12px;border:none;
+ border-radius:12px;font-weight:600;
+ background:linear-gradient(135deg,var(--accent),var(--accent2));
+ color:#000;width:100%;
 }
 
-.feed video{
- width:100%;
- border-radius:10px;
- margin-bottom:10px;
+#feedList{
+ height:100vh;overflow-y:scroll;
+ scroll-snap-type:y mandatory;
+}
+
+#feedList video{
+ width:100%;height:100vh;
+ object-fit:cover;scroll-snap-align:start;
+}
+
+.video-overlay{
+ position:absolute;bottom:100px;left:10px;right:10px;
+ display:flex;flex-direction:column;gap:6px;
+}
+
+input,select{
+ width:100%;padding:12px;margin-top:8px;
+ border-radius:10px;border:none;background:#111;color:white;
 }
 
 .chat-box{
- height:220px;
- overflow:auto;
- background:#000;
- padding:10px;
- border-radius:10px;
-}
-
-input{
- width:100%;
- padding:10px;
- margin-top:8px;
- border-radius:8px;
- border:none;
- background:#111;
- color:white;
+ height:60vh;overflow:auto;background:#000;padding:10px;border-radius:10px;
 }
 
 .badge{
- font-size:12px;
- color:#000;
- background:var(--accent);
- padding:3px 6px;
- border-radius:6px;
- margin-left:6px;
+ background:linear-gradient(135deg,var(--accent),var(--accent2));
+ color:#000;padding:4px 8px;border-radius:999px;
+ font-size:11px;
+}
+
+#notifications{
+ position:fixed;top:10px;left:50%;transform:translateX(-50%);
+ background:#111;padding:10px 15px;border-radius:10px;
+ display:none;
 }
 </style>
 </head>
 
 <body>
 
+<div id="notifications"></div>
+
 <nav>
-<button onclick="App.nav('home')">Home</button>
-<button onclick="App.nav('market')">Market</button>
-<button onclick="App.nav('services')">Services</button>
-<button onclick="App.nav('transport')">Transport</button>
-<button onclick="App.nav('feed')">Feed</button>
-<button onclick="App.nav('wallet')">Wallet</button>
-<button onclick="App.nav('chat')">Chat</button>
+<button onclick="nav('feed')">Feed</button>
+<button onclick="nav('market')">Market</button>
+<button onclick="nav('services')">Services</button>
+<button onclick="nav('creator')">Create</button>
+<button onclick="nav('leaderboard')">🔥</button>
+<button onclick="nav('wallet')">Wallet</button>
 </nav>
 
 <div class="container">
 
-<div id="home">
-<h2>Welcome</h2>
-<p>Your all-in-one super app</p>
+<div id="feed"><div id="feedList"></div></div>
+
+<div id="market" class="hidden"><h2>Marketplace</h2><div id="marketList"></div></div>
+
+<div id="services" class="hidden"><h2>Services</h2><div id="servicesList"></div></div>
+
+<div id="creator" class="hidden">
+<h2>Create</h2>
+<input id="creatorName" placeholder="Your name">
+<input id="videoUrl" placeholder="Video URL">
+<select id="videoCat">
+<option value="tech">Tech</option>
+<option value="life">Lifestyle</option>
+<option value="finance">Finance</option>
+</select>
+<button class="btn" onclick="publish()">Publish</button>
 </div>
 
-<div id="market" class="hidden"><h2>Marketplace</h2><div class="grid" id="marketList"></div></div>
-
-<div id="services" class="hidden"><h2>Services</h2><div class="grid" id="servicesList"></div></div>
-
-<div id="transport" class="hidden">
-<h2>Transport</h2>
-<button class="btn" onclick="Modules.transport.request()">Request Ride</button>
-<p id="rideStatus"></p>
-</div>
-
-<div id="feed" class="hidden">
-<h2>Feed</h2>
-<div id="feedList"></div>
+<div id="leaderboard" class="hidden">
+<h2>🔥 Trending</h2>
+<div id="trending"></div>
+<h2>🏆 Top Creators</h2>
+<div id="top"></div>
 </div>
 
 <div id="wallet" class="hidden">
 <h2>Wallet</h2>
 <p>Balance: $<span id="balance"></span></p>
-<div id="walletInfo"></div>
-<button class="btn" onclick="Modules.wallet.add()">Add $100</button>
-</div>
-
-<div id="chat" class="hidden">
-<h2>Chat</h2>
-<div class="chat-box" id="chatBox"></div>
-<input placeholder="Message..." onkeydown="Modules.chat.send(event)">
+<p id="score"></p>
+<button class="btn" onclick="addMoney()">Add $100</button>
 </div>
 
 </div>
 
 <script>
 
-// CORE APP
-const App = {
-
- state: JSON.parse(localStorage.getItem("marka")) || {
-  balance:500,
-  chat:[],
-  activity:0,
-  tier:"Bronze",
-  preferences:{},
-
-  market:[
-   {name:"Car Used",price:4000,cat:"auto"},
-   {name:"Apartment",price:20000,cat:"real"},
-   {name:"iPhone",price:800,cat:"tech"}
-  ],
-
-  services:[
-   {name:"Architect",price:200,cat:"pro"},
-   {name:"Psychologist",price:100,cat:"health"},
-   {name:"Accountant",price:150,cat:"finance"}
-  ],
-
-  feed:[
-   {video:"https://www.w3schools.com/html/mov_bbb.mp4",cat:"tech"},
-   {video:"https://www.w3schools.com/html/movie.mp4",cat:"life"}
-  ]
- },
-
- save(){
-  localStorage.setItem("marka",JSON.stringify(this.state));
- },
-
- nav(id){
-  document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
- },
-
- learn(cat){
-  if(!this.state.preferences[cat]) this.state.preferences[cat]=0;
-  this.state.preferences[cat]++;
-  this.state.activity+=10;
-  this.updateTier();
-  this.save();
- },
-
- updateTier(){
-  let s=this.state.activity;
-  this.state.tier = s>500?"Elite":s>300?"Gold":s>150?"Silver":"Bronze";
- },
-
- sort(items){
-  return items.sort((a,b)=>(this.state.preferences[b.cat]||0)-(this.state.preferences[a.cat]||0));
- }
-
+// STATE
+let state = JSON.parse(localStorage.getItem("marka")) || {
+ balance:500,
+ activity:0,
+ tier:"Bronze",
+ preferences:{},
+ following:[],
+ missions:{daily:false},
+ feed:[
+  {video:"https://www.w3schools.com/html/mov_bbb.mp4",cat:"tech",likes:5,comments:[],creator:"John",followers:10},
+  {video:"https://www.w3schools.com/html/movie.mp4",cat:"life",likes:3,comments:[],creator:"Anna",followers:7}
+ ]
 };
 
-// MODULES
-const Modules = {
+function save(){localStorage.setItem("marka",JSON.stringify(state));}
 
- market:{
-  render(){
-   let el=document.getElementById('marketList');
-   el.innerHTML="";
-   App.sort([...App.state.market]).forEach((p,i)=>{
-    el.innerHTML+=`
-    <div class="card">
-     <h3>${p.name}</h3>
-     <p>$${p.price}</p>
-     <button class="btn" onclick="Modules.market.buy(${i})">Buy</button>
-    </div>`;
-   });
-  },
+// NAV
+function nav(id){
+ document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ if(id==="leaderboard") renderLeaderboard();
+}
 
-  buy(i){
-   let items=App.sort([...App.state.market]);
-   let p=items[i];
-   if(App.state.balance>=p.price){
-    App.state.balance-=p.price;
-    App.learn(p.cat);
-    alert("Purchased");
-    Modules.wallet.update();
-   }else alert("No balance");
-  }
- },
+// AI
+function learn(cat){
+ state.preferences[cat]=(state.preferences[cat]||0)+1;
+ state.activity+=5;
+ updateTier();
+}
 
- services:{
-  render(){
-   let el=document.getElementById('servicesList');
-   el.innerHTML="";
-   App.sort([...App.state.services]).forEach((s,i)=>{
-    el.innerHTML+=`
-    <div class="card">
-     <h3>${s.name}</h3>
-     <p>$${s.price}</p>
-     <button class="btn" onclick="Modules.services.hire(${i})">Hire</button>
-    </div>`;
-   });
-  },
+// TIER
+function updateTier(){
+ let s=state.activity;
+ state.tier=s>500?"Elite":s>300?"Gold":s>150?"Silver":"Bronze";
+}
 
-  hire(i){
-   let s=App.sort([...App.state.services])[i];
-   App.learn(s.cat);
-   alert("Booked");
-   Modules.wallet.update();
-  }
- },
+// NOTIFICATION
+function notify(msg){
+ let n=document.getElementById('notifications');
+ n.innerText=msg;
+ n.style.display="block";
+ setTimeout(()=>n.style.display="none",2000);
+}
 
- transport:{
-  request(){
-   let el=document.getElementById('rideStatus');
-   el.innerText="Finding driver...";
-   App.learn("transport");
+// FEED
+function renderFeed(){
+ let el=document.getElementById('feedList');
+ el.innerHTML="";
 
-   setTimeout(()=>{
-    el.innerText="Driver arriving 🚗";
-    App.state.activity+=20;
-    App.updateTier();
-    App.save();
-   },2000);
-  }
- },
+ let vids=[...state.feed];
 
- feed:{
-  render(){
-   let el=document.getElementById('feedList');
-   el.innerHTML="";
-   App.sort([...App.state.feed]).forEach(v=>{
-    el.innerHTML+=`
-    <video src="${v.video}" controls autoplay muted loop onclick="App.learn('${v.cat}')"></video>`;
-   });
-  }
- },
+ vids.sort((a,b)=>{
+  let sa=(a.likes||0)+(a.comments?.length||0)*2;
+  let sb=(b.likes||0)+(b.comments?.length||0)*2;
+  return sb-sa;
+ });
 
- wallet:{
-  update(){
-   document.getElementById('balance').innerText=App.state.balance;
-   document.getElementById('walletInfo').innerHTML=`
-    <p>Score: ${App.state.activity}</p>
-    <p>Tier: ${App.state.tier} <span class="badge">${App.state.tier}</span></p>`;
-   App.save();
-  },
+ vids.forEach((v,i)=>{
+  el.innerHTML+=`
+  <div style="position:relative">
+   <video src="${v.video}" autoplay muted loop onclick="view(${i})"></video>
 
-  add(){
-   App.state.balance+=100;
-   App.state.activity+=5;
-   App.updateTier();
-   this.update();
-  }
- },
+   <div class="video-overlay">
+    <button class="btn" onclick="like(${i})">❤️ ${v.likes||0}</button>
+    <button class="btn" onclick="comment(${i})">💬 ${(v.comments||[]).length}</button>
+    <button class="btn" onclick="follow(${i})">➕ Follow</button>
+   </div>
+  </div>`;
+ });
+}
 
- chat:{
-  send(e){
-   if(e.key==="Enter"){
-    App.state.chat.push(e.target.value);
-    e.target.value="";
-    App.state.activity+=2;
-    App.updateTier();
-    this.render();
-    App.save();
-   }
-  },
+// ACTIONS
+function view(i){
+ let v=state.feed[i];
+ v.views=(v.views||0)+1;
+ learn(v.cat);
+ save();
+}
 
-  render(){
-   let box=document.getElementById('chatBox');
-   box.innerHTML=App.state.chat.map(m=>`<p>${m}</p>`).join('');
-  }
+function like(i){
+ let v=state.feed[i];
+ v.likes=(v.likes||0)+1;
+ state.activity+=5;
+ updateTier();
+ notify("Liked!");
+ renderFeed();
+ save();
+}
+
+function comment(i){
+ let t=prompt("Comment");
+ if(!t)return;
+ let v=state.feed[i];
+ v.comments.push(t);
+ state.activity+=8;
+ notify("Comment added");
+ renderFeed();
+ save();
+}
+
+function follow(i){
+ let v=state.feed[i];
+ if(!state.following.includes(v.creator)){
+  state.following.push(v.creator);
+  v.followers=(v.followers||0)+1;
+  state.activity+=10;
+  notify("Following "+v.creator);
  }
+ save();
+}
 
-};
+// CREATOR
+function publish(){
+ let name=document.getElementById('creatorName').value;
+ let url=document.getElementById('videoUrl').value;
+ let cat=document.getElementById('videoCat').value;
+
+ state.feed.push({
+  video:url,cat,creator:name,
+  likes:0,comments:[],followers:0
+ });
+
+ state.activity+=20;
+ updateTier();
+ notify("Published!");
+ renderFeed();
+ save();
+}
+
+// LEADERBOARD
+function renderLeaderboard(){
+ let t=document.getElementById('trending');
+ let top=document.getElementById('top');
+
+ let vids=[...state.feed];
+ vids.sort((a,b)=>((b.likes||0)+(b.comments.length*2))-((a.likes||0)+(a.comments.length*2)));
+
+ t.innerHTML="";
+ vids.slice(0,5).forEach(v=>{
+  t.innerHTML+=`<div class="card">${v.creator} - ${v.likes}❤️</div>`;
+ });
+
+ let creators={};
+ state.feed.forEach(v=>{
+  if(!creators[v.creator]) creators[v.creator]={score:0,followers:v.followers||0};
+  creators[v.creator].score+=(v.likes||0)+(v.comments.length*2);
+ });
+
+ let list=Object.entries(creators).sort((a,b)=>(b[1].score+b[1].followers)-(a[1].score+a[1].followers));
+
+ top.innerHTML="";
+ list.slice(0,5).forEach(([name,data],i)=>{
+  top.innerHTML+=`<div class="card">#${i+1} ${name} ⭐${data.score}</div>`;
+ });
+}
+
+// WALLET
+function addMoney(){
+ state.balance+=100;
+ state.activity+=5;
+ updateTier();
+ updateWallet();
+}
+
+function updateWallet(){
+ document.getElementById('balance').innerText=state.balance;
+ document.getElementById('score').innerText="Tier: "+state.tier+" | Score: "+state.activity;
+ save();
+}
 
 // INIT
-Modules.market.render();
-Modules.services.render();
-Modules.feed.render();
-Modules.chat.render();
-Modules.wallet.update();
+renderFeed();
+updateWallet();
 
 </script>
 
 </body>
-  </html>
+</html>
