@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MARKA | Autonomous Super-App</title>
+    <title>MARKA | Global Super-App</title>
     
     <!-- Premium Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,26 +42,56 @@
         .active-nav { color: #3B82F6; transform: translateY(-2px); }
         .btn-press:active { transform: scale(0.95); }
         .map-bg { background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .animate-fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        /* Centered Branding Overlay */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        .branding-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 4rem;
+            letter-spacing: 0.3em;
+            color: #3B82F6;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
     </style>
 </head>
 <body class="bg-premium-black text-white font-sans transition-colors duration-500 dark">
 
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col relative bg-premium-black dark:bg-premium-black light:bg-gray-50 overflow-hidden">
+    <!-- Splash Screen / Centered Branding -->
+    <div id="splash-screen">
+        <div class="branding-text">MARKA</div>
+    </div>
+
+    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col relative bg-premium-black dark:bg-premium-black light:bg-gray-50 overflow-hidden opacity-0 transition-opacity duration-1000">
         
-        <!-- Centered Header -->
+        <!-- Header -->
         <header class="glass sticky top-0 z-50 px-6 py-5 flex justify-between items-center">
-            <button id="theme-toggle" class="btn-press p-2 rounded-full hover:bg-white/5">
-                <i data-lucide="moon" id="theme-icon" class="w-5 h-5"></i>
+            <button id="lang-toggle" class="btn-press px-3 py-1 rounded-full bg-white/5 text-[10px] font-bold uppercase tracking-widest">
+                PT
             </button>
             
             <div class="absolute left-1/2 -translate-x-1/2">
-                <h1 class="font-display font-extrabold text-2xl tracking-[0.2em] text-white dark:text-white light:text-black">MARKA</h1>
+                <h1 class="font-display font-extrabold text-xl tracking-[0.2em] text-premium-accent">MARKA</h1>
             </div>
 
-            <button id="search-trigger" class="btn-press p-2 rounded-full hover:bg-white/5">
-                <i data-lucide="search" class="w-5 h-5"></i>
+            <button id="theme-toggle" class="btn-press p-2 rounded-full hover:bg-white/5">
+                <i data-lucide="moon" id="theme-icon" class="w-5 h-5"></i>
             </button>
         </header>
 
@@ -74,55 +104,79 @@
         <nav class="glass fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 px-8 py-4 flex justify-between items-center border-t border-white/5">
             <button onclick="router.navigate('home')" class="nav-item flex flex-col items-center gap-1" data-path="home">
                 <i data-lucide="home" class="w-6 h-6"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Início</span>
+                <span class="nav-label text-[9px] font-bold uppercase tracking-widest" data-key="nav_home">Início</span>
             </button>
             <button onclick="router.navigate('market')" class="nav-item flex flex-col items-center gap-1 text-gray-500" data-path="market">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Market</span>
+                <span class="nav-label text-[9px] font-bold uppercase tracking-widest" data-key="nav_market">Market</span>
             </button>
             <button onclick="router.navigate('wallet')" class="nav-item flex flex-col items-center gap-1 text-gray-500" data-path="wallet">
                 <i data-lucide="wallet" class="w-6 h-6"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Pagar</span>
+                <span class="nav-label text-[9px] font-bold uppercase tracking-widest" data-key="nav_pay">Pagar</span>
             </button>
             <button onclick="router.navigate('profile')" class="nav-item flex flex-col items-center gap-1 text-gray-500" data-path="profile">
                 <i data-lucide="user" class="w-6 h-6"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Eu</span>
+                <span class="nav-label text-[9px] font-bold uppercase tracking-widest" data-key="nav_me">Eu</span>
             </button>
         </nav>
 
-        <!-- Global Modal Container -->
+        <!-- Global Modal -->
         <div id="modal-container" class="fixed inset-0 z-[100] hidden">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="ui.closeModal()"></div>
-            <div id="modal-content" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto glass rounded-t-[32px] p-8 animate-slide-up">
-                <!-- Modal content -->
-            </div>
+            <div id="modal-content" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto glass rounded-t-[32px] p-8 animate-fade-in"></div>
         </div>
 
-        <!-- Notification Toast -->
+        <!-- Toast -->
         <div id="toast-container" class="fixed top-24 left-0 right-0 z-[110] px-6 pointer-events-none"></div>
     </div>
 
     <script type="module">
-        // --- State Management ---
+        // --- Translations ---
+        const i18n = {
+            pt: {
+                nav_home: "Início", nav_market: "Market", nav_pay: "Pagar", nav_me: "Eu",
+                balance: "Saldo Total", load: "CARREGAR", send: "ENVIAR", highlights: "Destaques",
+                welcome: "Bem-vindo à MARKA", buy: "Comprar", confirm: "Confirmar",
+                powered: "Powered by Magestade Pura Digital", rights: "Todos os direitos reservados",
+                faq_title: "Perguntas Frequentes", back: "VOLTAR",
+                search: "Pesquisar...", insufficient: "Saldo insuficiente",
+                success_buy: "Pagamento processado! Produto em trânsito."
+            },
+            en: {
+                nav_home: "Home", nav_market: "Market", nav_pay: "Pay", nav_me: "Me",
+                balance: "Total Balance", load: "LOAD", send: "SEND", highlights: "Highlights",
+                welcome: "Welcome to MARKA", buy: "Buy", confirm: "Confirm",
+                powered: "Powered by Magestade Pura Digital", rights: "All rights reserved",
+                faq_title: "Frequently Asked Questions", back: "BACK",
+                search: "Search...", insufficient: "Insufficient balance",
+                success_buy: "Payment processed! Product in transit."
+            },
+            osh: {
+                nav_home: "Eumbo", nav_market: "Omatala", nav_pay: "Futa", nav_me: "Aame",
+                balance: "Oimaliwa aishe", load: "TULA MO", send: "TUMA", highlights: "Oipopiwa",
+                welcome: "Tambula ko ku MARKA", buy: "Landa", confirm: "Koleka",
+                powered: "Powered by Magestade Pura Digital", rights: "Oufemba aushe owa tulwa po",
+                faq_title: "Omapulo e na ondunge", back: "SHUNA",
+                search: "Konga...", insufficient: "Oimaliwa inai wana",
+                success_buy: "Efuto la pwa! Oshinima oshi li mondjila."
+            }
+        };
+
+        // --- State ---
         const state = {
-            user: { balance: 250000, xp: 1500, tier: 'Elite', kyc: 'Gold', streak: 7 },
-            cart: [],
-            view: 'home',
+            lang: 'pt',
             theme: 'dark',
+            view: 'home',
+            user: { balance: 500000, handle: 'Premium User' },
             products: [
-                { id: 1, title: 'iPhone 15 Pro Max', price: 950000, img: 'https://picsum.photos/seed/p1/400/400', cat: 'Tech' },
-                { id: 2, title: 'Mercedes G63 AMG', price: 85000000, img: 'https://picsum.photos/seed/p2/400/400', cat: 'Auto' },
-                { id: 3, title: 'Penthouse Luanda', price: 120000000, img: 'https://picsum.photos/seed/p3/400/400', cat: 'Real Estate' },
-                { id: 4, title: 'Rolex Submariner', price: 12500000, img: 'https://picsum.photos/seed/p4/400/400', cat: 'Luxury' }
-            ],
-            faqs: [
-                { q: "O que é a MARKA?", a: "A MARKA é um super-app autónomo que integra marketplace, pagamentos, transporte e serviços numa única plataforma segura." },
-                { q: "Como funciona o Anti-Fraude?", a: "Utilizamos IA para monitorizar transações em tempo real, bloqueando comportamentos suspeitos e garantindo que o seu dinheiro está seguro em escrow." },
-                { q: "Como posso carregar a carteira?", a: "Pode carregar via Multicaixa Express, transferência bancária ou depósito direto nos nossos agentes parceiros." }
+                { id: 1, title: 'iPhone 15 Pro', price: 950000, img: 'https://picsum.photos/seed/p1/400/400' },
+                { id: 2, title: 'Mercedes G63', price: 85000000, img: 'https://picsum.photos/seed/p2/400/400' },
+                { id: 3, title: 'Penthouse', price: 120000000, img: 'https://picsum.photos/seed/p3/400/400' },
+                { id: 4, title: 'Rolex', price: 12500000, img: 'https://picsum.photos/seed/p4/400/400' }
             ]
         };
 
-        // --- Router ---
+        // --- Core Logic ---
         window.router = {
             navigate: (view) => {
                 state.view = view;
@@ -131,8 +185,16 @@
             }
         };
 
-        // --- UI Logic ---
         window.ui = {
+            notify: (msg, type = 'success') => {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `glass p-4 rounded-2xl mb-3 shadow-2xl border-l-4 ${type === 'success' ? 'border-green-500' : 'border-blue-500'} flex items-center gap-3 animate-fade-in pointer-events-auto`;
+                toast.innerHTML = `<i data-lucide="info" class="w-5 h-5 ${type === 'success' ? 'text-green-500' : 'text-blue-500'}"></i><p class="text-sm font-bold">${msg}</p>`;
+                container.appendChild(toast);
+                lucide.createIcons();
+                setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+            },
             openModal: (content) => {
                 const container = document.getElementById('modal-container');
                 const inner = document.getElementById('modal-content');
@@ -140,17 +202,13 @@
                 container.classList.remove('hidden');
                 lucide.createIcons();
             },
-            closeModal: () => {
-                document.getElementById('modal-container').classList.add('hidden');
-            },
-            notify: (msg, type = 'success') => {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `glass p-4 rounded-2xl mb-3 shadow-2xl border-l-4 ${type === 'success' ? 'border-green-500' : 'border-blue-500'} flex items-center gap-3 animate-slide-up pointer-events-auto`;
-                toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5 ${type === 'success' ? 'text-green-500' : 'text-blue-500'}"></i><p class="text-sm font-bold">${msg}</p>`;
-                container.appendChild(toast);
-                lucide.createIcons();
-                setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+            closeModal: () => document.getElementById('modal-container').classList.add('hidden'),
+            toggleLang: () => {
+                const langs = ['pt', 'en', 'osh'];
+                const idx = (langs.indexOf(state.lang) + 1) % langs.length;
+                state.lang = langs[idx];
+                document.getElementById('lang-toggle').innerText = state.lang.toUpperCase();
+                render();
             },
             toggleTheme: () => {
                 state.theme = state.theme === 'dark' ? 'light' : 'dark';
@@ -161,110 +219,87 @@
             }
         };
 
-        // --- Actions ---
         window.actions = {
-            buyProduct: (id) => {
+            buy: (id) => {
                 const p = state.products.find(x => x.id === id);
-                if (state.user.balance >= p.price) {
-                    ui.openModal(`
-                        <div class="text-center">
-                            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i data-lucide="shield-check" class="w-10 h-10 text-green-500"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2">Confirmar Compra</h3>
-                            <p class="text-gray-400 text-sm mb-6">O valor de <b>${p.price.toLocaleString()} Kz</b> será retido em Escrow até à entrega.</p>
-                            <button onclick="actions.confirmPurchase(${id})" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Pagar Agora</button>
-                        </div>
-                    `);
-                } else {
-                    ui.notify('Saldo insuficiente', 'error');
-                }
-            },
-            confirmPurchase: (id) => {
-                const p = state.products.find(x => x.id === id);
-                state.user.balance -= p.price;
-                ui.closeModal();
-                ui.notify('Pagamento processado! Produto em trânsito.');
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                render();
-            },
-            addFunds: () => {
+                if (state.user.balance < p.price) return ui.notify(i18n[state.lang].insufficient, 'error');
                 ui.openModal(`
-                    <h3 class="text-xl font-bold mb-6">Adicionar Fundos</h3>
-                    <div class="space-y-4">
-                        <input type="number" id="fund-amount" placeholder="Valor em Kz" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-premium-accent">
-                        <button onclick="actions.processDeposit()" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Gerar Referência</button>
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold mb-4">${i18n[state.lang].confirm} ${p.title}</h3>
+                        <p class="text-gray-400 text-sm mb-6">${p.price.toLocaleString()} Kz</p>
+                        <button onclick="actions.confirmBuy(${id})" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">${i18n[state.lang].buy}</button>
                     </div>
                 `);
             },
-            processDeposit: () => {
-                const amt = parseInt(document.getElementById('fund-amount').value) || 0;
-                state.user.balance += amt;
+            confirmBuy: (id) => {
+                const p = state.products.find(x => x.id === id);
+                state.user.balance -= p.price;
                 ui.closeModal();
-                ui.notify(`+${amt.toLocaleString()} Kz adicionados!`);
+                ui.notify(i18n[state.lang].success_buy);
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 render();
             }
         };
 
+        // --- Views ---
         // --- Dynamic Data ---
-        const data = {
+        const modules = {
             restaurants: [
-                { id: 1, name: 'KFC Luanda', rating: 4.8, time: '20-30 min', img: 'https://picsum.photos/seed/kfc/800/400' },
-                { id: 2, name: 'Pizzaria Veneza', rating: 4.5, time: '35-45 min', img: 'https://picsum.photos/seed/pizza/800/400' },
-                { id: 3, name: 'Churrascaria Premium', rating: 4.9, time: '25-35 min', img: 'https://picsum.photos/seed/bbq/800/400' }
+                { name: 'KFC Luanda', rating: 4.8, time: '20-30 min', img: 'https://picsum.photos/seed/kfc/800/400' },
+                { name: 'Pizzaria Veneza', rating: 4.5, time: '35-45 min', img: 'https://picsum.photos/seed/pizza/800/400' }
             ],
             jobs: [
-                { id: 1, title: 'UI/UX Designer', budget: 250000, proposals: 12 },
-                { id: 2, title: 'Dev React Native', budget: 500000, proposals: 8 },
-                { id: 3, title: 'Copywriter Português', budget: 150000, proposals: 5 }
+                { title: 'UI/UX Designer', budget: 250000, proposals: 12 },
+                { title: 'React Developer', budget: 500000, proposals: 8 }
             ],
             flights: [
-                { id: 1, from: 'LAD', to: 'LIS', price: 450000, time: '6h 30m' },
-                { id: 2, from: 'LAD', to: 'NYC', price: 850000, time: '10h 15m' },
-                { id: 3, from: 'LAD', to: 'JNB', price: 280000, time: '3h 45m' }
-            ],
-            utilities: [
-                { id: 1, name: 'ENDE', icon: 'zap', color: 'bg-yellow-500' },
-                { id: 2, name: 'EPAL', icon: 'droplet', color: 'bg-blue-500' },
-                { id: 3, name: 'ZAP', icon: 'tv', color: 'bg-orange-500' },
-                { id: 4, name: 'UNITEL', icon: 'phone', color: 'bg-orange-600' }
+                { from: 'LAD', to: 'LIS', price: 450000, time: '6h 30m' },
+                { from: 'LAD', to: 'NYC', price: 850000, time: '10h 15m' }
             ]
         };
 
-        // --- Views ---
         const Views = {
             home: () => `
-                <div class="px-6 py-4">
-                    <div class="glass p-8 rounded-[32px] mb-8 relative overflow-hidden">
-                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-premium-accent/10 rounded-full blur-3xl"></div>
-                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Saldo Total</p>
+                <div class="px-6 py-4 animate-fade-in">
+                    <div class="glass p-8 rounded-[32px] mb-8 relative overflow-hidden bg-gradient-to-br from-premium-accent/10 to-transparent">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">${i18n[state.lang].balance}</p>
                         <h2 class="text-4xl font-display font-bold mb-6">${state.user.balance.toLocaleString()} Kz</h2>
                         <div class="flex gap-3">
-                            <button onclick="actions.addFunds()" class="flex-1 py-3 bg-white text-black rounded-xl font-bold text-xs btn-press">CARREGAR</button>
-                            <button onclick="router.navigate('wallet')" class="flex-1 py-3 bg-premium-accent text-white rounded-xl font-bold text-xs btn-press">ENVIAR</button>
+                            <button onclick="ui.notify('Deposit feature coming soon')" class="flex-1 py-3 bg-white text-black rounded-xl font-bold text-xs btn-press">${i18n[state.lang].load}</button>
+                            <button onclick="router.navigate('wallet')" class="flex-1 py-3 bg-premium-accent text-white rounded-xl font-bold text-xs btn-press">${i18n[state.lang].send}</button>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-4 gap-4 mb-8">
+                    <div class="grid grid-cols-4 gap-y-6 gap-x-4 mb-8">
                         ${[
                             { id: 'market', icon: 'shopping-bag', label: 'Market' },
                             { id: 'transport', icon: 'car', label: 'Uber' },
                             { id: 'food', icon: 'utensils', label: 'Food' },
-                            { id: 'travel', icon: 'plane', label: 'Viagem' }
+                            { id: 'travel', icon: 'plane', label: 'Travel' },
+                            { id: 'freelance', icon: 'briefcase', label: 'Jobs' },
+                            { id: 'bills', icon: 'zap', label: 'Bills' },
+                            { id: 'clothing', icon: 'shirt', label: 'Fashion' },
+                            { id: 'social', icon: 'video', label: 'Social' },
+                            { id: 'leaderboard', icon: 'trophy', label: 'Ranking' },
+                            { id: 'gamification', icon: 'target', label: 'Missions' },
+                            { id: 'creator', icon: 'camera', label: 'Studio' },
+                            { id: 'kyc', icon: 'user-check', label: 'KYC' },
+                            { id: 'escrow', icon: 'lock', label: 'Escrow' },
+                            { id: 'antifraud', icon: 'shield-check', label: 'Security' },
+                            { id: 'admin', icon: 'settings', label: 'Admin' },
+                            { id: 'faq', icon: 'help-circle', label: 'FAQ' }
                         ].map(m => `
                             <button onclick="router.navigate('${m.id}')" class="flex flex-col items-center gap-2 btn-press">
                                 <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center shadow-xl">
                                     <i data-lucide="${m.icon}" class="w-6 h-6"></i>
                                 </div>
-                                <span class="text-[10px] font-bold text-gray-500 uppercase">${m.label}</span>
+                                <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">${m.label}</span>
                             </button>
                         `).join('')}
                     </div>
-
-                    <h3 class="font-display font-bold text-xl mb-4">Destaques</h3>
+                    <h3 class="font-display font-bold text-xl mb-4">${i18n[state.lang].highlights}</h3>
                     <div class="grid grid-cols-2 gap-4">
                         ${state.products.map(p => `
-                            <div class="glass rounded-3xl overflow-hidden border border-white/5 btn-press" onclick="actions.buyProduct(${p.id})">
+                            <div class="glass rounded-3xl overflow-hidden border border-white/5 btn-press" onclick="actions.buy(${p.id})">
                                 <img src="${p.img}" class="w-full h-32 object-cover">
                                 <div class="p-4">
                                     <h4 class="text-xs font-bold truncate">${p.title}</h4>
@@ -276,21 +311,15 @@
                 </div>
             `,
             market: () => `
-                <div class="px-6 py-4">
-                    <h2 class="text-2xl font-display font-bold mb-6">Marketplace</h2>
-                    <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar">
-                        ${['Todos', 'Tech', 'Auto', 'Imóveis', 'Moda'].map(c => `
-                            <span class="px-5 py-2 glass rounded-full text-xs font-bold whitespace-nowrap">${c}</span>
-                        `).join('')}
-                    </div>
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">${i18n[state.lang].nav_market}</h2>
                     <div class="space-y-4">
                         ${state.products.map(p => `
-                            <div class="glass p-4 rounded-3xl flex gap-4 items-center border border-white/5 btn-press" onclick="actions.buyProduct(${p.id})">
+                            <div class="glass p-4 rounded-3xl flex gap-4 items-center border border-white/5 btn-press" onclick="actions.buy(${p.id})">
                                 <img src="${p.img}" class="w-20 h-20 rounded-2xl object-cover">
                                 <div class="flex-1">
                                     <h4 class="font-bold text-sm">${p.title}</h4>
                                     <p class="text-premium-accent font-bold text-sm">${p.price.toLocaleString()} Kz</p>
-                                    <p class="text-[10px] text-gray-500 mt-1">Vendedor Verificado</p>
                                 </div>
                                 <i data-lucide="chevron-right" class="w-5 h-5 text-gray-700"></i>
                             </div>
@@ -298,44 +327,304 @@
                     </div>
                 </div>
             `,
-            transport: () => `
-                <div class="h-[calc(100vh-200px)] flex flex-col">
-                    <div class="flex-1 map-bg relative">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-16 h-16 bg-premium-accent/20 rounded-full animate-ping"></div>
-                            <div class="w-4 h-4 bg-premium-accent rounded-full absolute shadow-[0_0_20px_rgba(59,130,246,0.8)]"></div>
-                        </div>
-                    </div>
-                    <div class="glass p-8 rounded-t-[40px] -mt-10 relative z-10">
-                        <h3 class="text-xl font-bold mb-6">Para onde vamos?</h3>
-                        <div class="space-y-3 mb-6">
-                            <div class="p-4 bg-white/5 rounded-2xl flex items-center gap-3">
-                                <i data-lucide="map-pin" class="w-4 h-4 text-green-500"></i>
-                                <input type="text" placeholder="Localização atual" class="bg-transparent outline-none text-sm w-full">
-                            </div>
-                            <div class="p-4 bg-white/5 rounded-2xl flex items-center gap-3">
-                                <i data-lucide="navigation" class="w-4 h-4 text-premium-accent"></i>
-                                <input type="text" placeholder="Destino" class="bg-transparent outline-none text-sm w-full">
-                            </div>
-                        </div>
-                        <button onclick="ui.notify('A procurar motoristas...')" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Pedir Marka</button>
-                    </div>
-                </div>
-            `,
             wallet: () => `
-                <div class="px-6 py-4">
-                    <h2 class="text-2xl font-display font-bold mb-6">Minha Carteira</h2>
-                    <div class="glass p-8 rounded-[32px] bg-gradient-to-br from-premium-accent to-blue-800 mb-8">
-                        <p class="text-white/60 text-xs font-bold uppercase mb-1">Disponível</p>
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">${i18n[state.lang].nav_pay}</h2>
+                    <div class="glass p-8 rounded-[32px] bg-premium-accent mb-8">
+                        <p class="text-white/60 text-xs font-bold uppercase mb-1">${i18n[state.lang].balance}</p>
                         <h2 class="text-4xl font-display font-bold text-white">${state.user.balance.toLocaleString()} Kz</h2>
                     </div>
-                    <h3 class="font-bold mb-4">Transações</h3>
                     <div class="space-y-3">
                         ${[1,2,3].map(i => `
                             <div class="glass p-4 rounded-2xl flex justify-between items-center border border-white/5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                                        <i data-lucide="arrow-down-left" class="w-5 h-5 text-green-500"></i>
+                                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center"><i data-lucide="arrow-down-left" class="w-5 h-5 text-green-500"></i></div>
+                                    <div><p class="text-sm font-bold">Transfer</p><p class="text-[10px] text-gray-500">Today</p></div>
+                                </div>
+                                <p class="font-bold text-green-500">+50.000 Kz</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            profile: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <div class="flex flex-col items-center mb-8">
+                        <div class="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-premium-accent to-purple-500 mb-4">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Marka" class="w-full h-full rounded-full bg-premium-dark">
+                        </div>
+                        <h2 class="text-2xl font-display font-bold">${state.user.handle}</h2>
+                    </div>
+                    <div class="space-y-2 mb-12">
+                        <button onclick="ui.notify('FAQ coming soon')" class="w-full glass p-5 rounded-2xl flex justify-between items-center btn-press">
+                            <span class="font-bold text-sm">${i18n[state.lang].faq_title}</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-700"></i>
+                        </button>
+                    </div>
+                    <div class="text-center opacity-40 space-y-2">
+                        <p class="text-[10px] font-bold uppercase tracking-widest">© 2026 MARKA GLOBAL</p>
+                        <p class="text-[9px] font-medium">${i18n[state.lang].rights}</p>
+                        <p class="text-[11px] font-extrabold text-premium-accent tracking-tighter">${i18n[state.lang].powered}</p>
+                    </div>
+                </div>
+            `,
+            food: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Food Delivery</h2>
+                    <div class="space-y-4">
+                        ${modules.restaurants.map(r => `
+                            <div class="glass p-5 rounded-3xl border border-white/5 btn-press" onclick="ui.notify('${r.name} added to cart!')">
+                                <img src="${r.img}" class="w-full h-32 rounded-2xl object-cover mb-3">
+                                <div class="flex justify-between items-start">
+                                    <div><h4 class="font-bold text-sm">${r.name}</h4><p class="text-[10px] text-gray-500">${r.time}</p></div>
+                                    <span class="text-premium-accent font-bold">★ ${r.rating}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            transport: () => `
+                <div class="h-[calc(100vh-200px)] flex flex-col animate-fade-in">
+                    <div class="flex-1 map-bg relative"><div class="absolute inset-0 flex items-center justify-center"><div class="w-4 h-4 bg-premium-accent rounded-full shadow-[0_0_20px_rgba(59,130,246,0.8)]"></div></div></div>
+                    <div class="glass p-8 rounded-t-[40px] -mt-10 relative z-10">
+                        <h3 class="text-xl font-bold mb-6">Request a Ride</h3>
+                        <button onclick="ui.notify('Finding drivers...')" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Book Ride</button>
+                    </div>
+                </div>
+            `,
+            freelance: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Freelance</h2>
+                    <div class="space-y-4">
+                        ${modules.jobs.map(j => `
+                            <div class="glass p-6 rounded-3xl border border-white/5 btn-press" onclick="ui.notify('Applied to: ${j.title}')">
+                                <h4 class="font-bold text-sm mb-2">${j.title}</h4>
+                                <div class="flex justify-between items-center mb-4">
+                                    <p class="text-premium-accent font-bold text-xs">${j.budget.toLocaleString()} Kz</p>
+                                    <p class="text-[10px] text-gray-500">${j.proposals} proposals</p>
+                                </div>
+                                <button class="w-full py-2 bg-white/5 rounded-xl text-[10px] font-bold">Apply</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            travel: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Travel</h2>
+                    <div class="glass p-6 rounded-3xl mb-6 space-y-4">
+                        <div class="flex gap-2">
+                            <button class="flex-1 py-2 bg-premium-accent text-white rounded-xl text-xs font-bold">Flights</button>
+                            <button class="flex-1 py-2 bg-white/5 rounded-xl text-xs font-bold">Hotels</button>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        ${modules.flights.map(f => `
+                            <div class="glass p-5 rounded-3xl border border-white/5 btn-press" onclick="actions.buy(1)">
+                                <div class="flex justify-between items-center">
+                                    <div><p class="font-bold text-sm">${f.from} → ${f.to}</p><p class="text-[10px] text-gray-500">${f.time}</p></div>
+                                    <p class="text-premium-accent font-bold">${f.price.toLocaleString()} Kz</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            bills: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Bills & Payments</h2>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        ${['ENDE', 'EPAL', 'ZAP', 'UNITEL'].map(u => `
+                            <button class="glass p-8 rounded-3xl flex flex-col items-center gap-3 btn-press" onclick="ui.notify('${u} selected')">
+                                <div class="w-14 h-14 bg-premium-accent rounded-2xl flex items-center justify-center"><i data-lucide="zap" class="w-6 h-6 text-white"></i></div>
+                                <span class="font-bold text-xs">${u}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            clothing: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Fashion</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${[1,2,3,4].map(i => `
+                            <div class="glass rounded-3xl overflow-hidden border border-white/5 btn-press" onclick="actions.buy(${i})">
+                                <img src="https://picsum.photos/seed/fashion${i}/400/500" class="w-full h-40 object-cover">
+                                <div class="p-3"><h4 class="text-xs font-bold">Collection ${i}</h4><p class="text-premium-accent font-bold text-xs mt-1">${(15000 + i*5000).toLocaleString()} Kz</p></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            social: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Social Feed</h2>
+                    <div class="space-y-6">
+                        ${[1,2,3].map(i => `
+                            <div class="glass rounded-3xl overflow-hidden border border-white/5">
+                                <img src="https://picsum.photos/seed/social${i}/400/500" class="w-full h-48 object-cover">
+                                <div class="p-4">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${i}" class="w-8 h-8 rounded-full">
+                                        <div><p class="text-xs font-bold">@creator_${i}</p><p class="text-[9px] text-gray-500">2h ago</p></div>
                                     </div>
-                                    <div>
-                                
+                                    <div class="flex gap-4 text-xs font-bold">
+                                        <button class="flex items-center gap-1 btn-press" onclick="ui.notify('Liked!')"><i data-lucide="heart" class="w-4 h-4"></i> ${Math.floor(Math.random()*1000)}</button>
+                                        <button class="flex items-center gap-1 btn-press" onclick="ui.notify('Commented!')"><i data-lucide="message-circle" class="w-4 h-4"></i> ${Math.floor(Math.random()*100)}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            leaderboard: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Leaderboard</h2>
+                    <div class="space-y-3">
+                        ${[1,2,3,4,5].map(i => `
+                            <div class="glass p-4 rounded-2xl flex items-center gap-4 border border-white/5">
+                                <div class="w-10 h-10 flex items-center justify-center font-bold text-lg ${i === 1 ? 'text-premium-gold' : 'text-gray-400'}">\#${i}</div>
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}" class="w-10 h-10 rounded-full">
+                                <div class="flex-1"><p class="font-bold text-sm">User ${i}</p><p class="text-[10px] text-gray-500">${(10000 - i*1000)} XP</p></div>
+                                <p class="font-bold text-premium-accent text-xs">${(10000 - i*1000)} pts</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            gamification: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Missions</h2>
+                    <div class="glass p-6 rounded-3xl mb-6 bg-gradient-to-br from-premium-accent/20 to-purple-500/20">
+                        <p class="text-xs text-gray-400 uppercase font-bold mb-1">Current Streak</p>
+                        <p class="text-4xl font-bold">7 Days</p>
+                    </div>
+                    <div class="space-y-3">
+                        ${['Buy 1 item', 'Invite friend', 'Complete profile'].map(m => `
+                            <div class="glass p-4 rounded-2xl flex justify-between items-center btn-press" onclick="ui.notify('Mission: ${m}!')">
+                                <div class="flex items-center gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i><span class="text-xs font-bold">${m}</span></div>
+                                <span class="text-premium-accent font-bold text-xs">+100 XP</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            creator: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Creator Studio</h2>
+                    <div class="glass p-6 rounded-3xl mb-6 border border-white/5">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center"><p class="text-xs text-gray-400">Followers</p><p class="font-bold">12.5k</p></div>
+                            <div class="flex justify-between items-center"><p class="text-xs text-gray-400">Views</p><p class="font-bold">245k</p></div>
+                            <div class="flex justify-between items-center"><p class="text-xs text-gray-400">Engagement</p><p class="font-bold text-premium-accent">8.5%</p></div>
+                        </div>
+                    </div>
+                    <button onclick="ui.notify('Upload started')" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Upload Video</button>
+                </div>
+            `,
+            kyc: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">KYC Verification</h2>
+                    <div class="space-y-4">
+                        <div class="glass p-6 rounded-3xl border-2 border-green-500/30 bg-green-500/5">
+                            <div class="flex items-center gap-3 mb-3"><i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i><h4 class="font-bold">KYC1 - Buyer</h4></div>
+                            <p class="text-xs text-gray-400">Limit: up to 50.000 Kz</p>
+                        </div>
+                        <div class="glass p-6 rounded-3xl border-2 border-yellow-500/30 bg-yellow-500/5">
+                            <div class="flex items-center gap-3 mb-3"><i data-lucide="alert-circle" class="w-6 h-6 text-yellow-500"></i><h4 class="font-bold">KYC2 - Seller</h4></div>
+                            <p class="text-xs text-gray-400">Pending: Send ID and Selfie</p>
+                            <button onclick="ui.notify('KYC2 process started')" class="w-full mt-3 py-2 bg-yellow-500/20 rounded-lg text-xs font-bold">Complete Now</button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            escrow: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Escrow & Security</h2>
+                    <div class="glass p-6 rounded-3xl mb-6">
+                        <p class="text-xs text-gray-400 uppercase font-bold mb-1">In Escrow</p>
+                        <p class="text-3xl font-bold text-premium-accent">125.000 Kz</p>
+                        <p class="text-xs text-gray-500 mt-2">Protecting your transactions</p>
+                    </div>
+                    <div class="space-y-3">
+                        ${[1,2].map(i => `
+                            <div class="glass p-4 rounded-2xl border border-white/5">
+                                <div class="flex justify-between items-start mb-2"><p class="font-bold text-sm">Order #${1000+i}</p><span class="px-2 py-1 bg-blue-500/20 text-blue-500 rounded text-[9px] font-bold">In Transit</span></div>
+                                <p class="text-xs text-gray-500">${50000 * i} Kz • Delivery in 3 days</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            antifraud: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <h2 class="text-2xl font-display font-bold mb-6">Anti-Fraud</h2>
+                    <div class="space-y-4">
+                        <div class="glass p-6 rounded-3xl border-2 border-green-500/30 bg-green-500/5">
+                            <div class="flex items-center gap-3"><i data-lucide="shield-check" class="w-6 h-6 text-green-500"></i><div><h4 class="font-bold text-sm">Account Secure</h4><p class="text-xs text-gray-400">No suspicious activity</p></div></div>
+                        </div>
+                        <div class="glass p-6 rounded-3xl"><h4 class="font-bold text-sm mb-3">Active Protections</h4><div class="space-y-2">${['Contact blocking', 'Velocity checks', 'Device fingerprint'].map(p => `<div class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i><span class="text-xs">${p}</span></div>`).join('')}</div></div>
+                    </div>
+                </div>
+            `,
+            admin: () => `
+                <div class="px-6 py-4 animate-fade-in">
+                    <div class="flex items-center gap-3 mb-6"><i data-lucide="shield-alert" class="w-8 h-8 text-red-500"></i><h2 class="text-2xl font-display font-bold">Admin Panel</h2></div>
+                    <div class="space-y-4">
+                        <div class="glass p-6 rounded-3xl border border-red-500/20">
+                            <h3 class="font-bold text-sm mb-4">Human Review Queue</h3>
+                            <div class="space-y-3">
+                                <div class="p-3 bg-white/5 rounded-xl flex justify-between items-center btn-press" onclick="ui.notify('Dispute #842 under review')">
+                                    <span class="text-xs">Dispute #842 - 45.000 Kz</span>
+                                    <button class="px-3 py-1 bg-premium-accent rounded-lg text-[10px] font-bold">Review</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="glass p-4 rounded-2xl"><p class="text-[10px] text-gray-500 font-bold uppercase">Total GMV</p><p class="text-lg font-bold">1.2M Kz</p></div>
+                            <div class="glass p-4 rounded-2xl"><p class="text-[10px] text-gray-500 font-bold uppercase">App Fees</p><p class="text-lg font-bold">120K Kz</p></div>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // --- Render ---
+        const render = () => {
+            const main = document.getElementById('main-content');
+            main.innerHTML = (Views[state.view] || Views.home)();
+            
+            // Update Nav Labels
+            document.querySelectorAll('.nav-label').forEach(el => {
+                el.innerText = i18n[state.lang][el.dataset.key];
+            });
+
+            // Update Nav Active State
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.toggle('active-nav', el.dataset.path === state.view);
+                el.classList.toggle('text-gray-500', el.dataset.path !== state.view);
+            });
+
+            lucide.createIcons();
+        };
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Splash sequence
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const app = document.getElementById('app');
+                splash.style.opacity = '0';
+                app.style.opacity = '1';
+                setTimeout(() => splash.style.visibility = 'hidden', 800);
+            }, 2500);
+
+            render();
+            document.getElementById('theme-toggle').addEventListener('click', ui.toggleTheme);
+            document.getElementById('lang-toggle').addEventListener('click', ui.toggleLang);
+        });
+    </script>
+</body>
+</html>
