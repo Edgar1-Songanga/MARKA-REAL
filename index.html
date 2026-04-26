@@ -3,315 +3,258 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MARKA Super App</title>
+<title>MARKA Global v3.0</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
- --bg:#05070f;
- --card:rgba(255,255,255,0.04);
- --border:rgba(255,255,255,0.08);
- --accent:#00f0ff;
- --accent2:#8b5cf6;
- --text:#fff;
- --muted:#9aa4b2;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:Inter;background:#000;color:var(--text);overflow-x:hidden;}
-
-nav{
- position:fixed;bottom:0;width:100%;
- display:flex;justify-content:space-around;
- padding:10px;background:rgba(0,0,0,0.7);
- backdrop-filter:blur(12px);border-top:1px solid var(--border);
-}
-
-nav button{
- background:none;border:none;color:var(--muted);
- font-size:12px;cursor:pointer;
-}
-
-.container{padding:12px;padding-bottom:80px;}
-
-.hidden{display:none;}
-
-.card{
- background:var(--card);
- border:1px solid var(--border);
- border-radius:14px;padding:14px;margin-bottom:10px;
-}
-
-.btn{
- margin-top:10px;padding:12px;border:none;
- border-radius:12px;font-weight:600;
- background:linear-gradient(135deg,var(--accent),var(--accent2));
- color:#000;width:100%;
-}
-
-#feedList{
- height:100vh;overflow-y:scroll;
- scroll-snap-type:y mandatory;
-}
-
-#feedList video{
- width:100%;height:100vh;
- object-fit:cover;scroll-snap-align:start;
-}
-
-.video-overlay{
- position:absolute;bottom:100px;left:10px;right:10px;
- display:flex;flex-direction:column;gap:6px;
-}
-
-input,select{
- width:100%;padding:12px;margin-top:8px;
- border-radius:10px;border:none;background:#111;color:white;
-}
-
-.chat-box{
- height:60vh;overflow:auto;background:#000;padding:10px;border-radius:10px;
-}
-
-.badge{
- background:linear-gradient(135deg,var(--accent),var(--accent2));
- color:#000;padding:4px 8px;border-radius:999px;
- font-size:11px;
-}
-
-#notifications{
- position:fixed;top:10px;left:50%;transform:translateX(-50%);
- background:#111;padding:10px 15px;border-radius:10px;
- display:none;
-}
+body{margin:0;font-family:Inter;background:#070a14;color:#fff;}
+nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#000;padding:10px;z-index:10}
+nav button{background:none;border:none;color:#aaa;font-size:12px}
+.container{padding:15px;padding-bottom:90px}
+.hidden{display:none}
+.card{background:#121826;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid #1f2937}
+.btn{width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#00f0ff,#8b5cf6);color:#000;font-weight:bold}
+input,select{width:100%;padding:10px;margin-top:8px;border-radius:10px;border:none;background:#111;color:#fff}
+video{width:100%;border-radius:12px}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px}
 </style>
 </head>
 
 <body>
 
-<div id="notifications"></div>
-
-<nav>
-<button onclick="nav('feed')">Feed</button>
-<button onclick="nav('market')">Market</button>
-<button onclick="nav('services')">Services</button>
-<button onclick="nav('creator')">Create</button>
-<button onclick="nav('leaderboard')">🔥</button>
-<button onclick="nav('wallet')">Wallet</button>
-</nav>
-
 <div class="container">
 
-<div id="feed"><div id="feedList"></div></div>
-
-<div id="market" class="hidden"><h2>Marketplace</h2><div id="marketList"></div></div>
-
-<div id="services" class="hidden"><h2>Services</h2><div id="servicesList"></div></div>
-
-<div id="creator" class="hidden">
-<h2>Create</h2>
-<input id="creatorName" placeholder="Your name">
-<input id="videoUrl" placeholder="Video URL">
-<select id="videoCat">
-<option value="tech">Tech</option>
-<option value="life">Lifestyle</option>
-<option value="finance">Finance</option>
-</select>
-<button class="btn" onclick="publish()">Publish</button>
+<div id="feed">
+<h2>🔥 Feed</h2>
+<div id="feedList"></div>
 </div>
 
-<div id="leaderboard" class="hidden">
-<h2>🔥 Trending</h2>
-<div id="trending"></div>
-<h2>🏆 Top Creators</h2>
-<div id="top"></div>
+<div id="market" class="hidden"></div>
+
+<div id="kyc" class="hidden">
+<h2>KYC Verification</h2>
+<input id="name" placeholder="Full name">
+<input id="bi" placeholder="BI Number">
+<button class="btn" onclick="kyc()">Submit KYC</button>
 </div>
 
 <div id="wallet" class="hidden">
 <h2>Wallet</h2>
-<p>Balance: $<span id="balance"></span></p>
-<p id="score"></p>
-<button class="btn" onclick="addMoney()">Add $100</button>
+<p>Balance: <span id="bal"></span></p>
+<button class="btn" onclick="addFunds()">Add Test Funds</button>
+</div>
+
+<div id="creator" class="hidden">
+<h2>Create Video</h2>
+<input id="creatorName" placeholder="Creator name">
+<input id="videoUrl" placeholder="Video URL">
+<button class="btn" onclick="publish()">Publish</button>
+</div>
+
+<div id="leaderboard" class="hidden">
+<h2>🏆 Trending</h2>
+<div id="trend"></div>
+<h2>Creators</h2>
+<div id="creators"></div>
 </div>
 
 </div>
+
+<nav>
+<button onclick="nav('feed')">Feed</button>
+<button onclick="nav('market')">Market</button>
+<button onclick="nav('kyc')">KYC</button>
+<button onclick="nav('wallet')">Wallet</button>
+<button onclick="nav('creator')">Create</button>
+<button onclick="nav('leaderboard')">🔥</button>
+</nav>
 
 <script>
 
-// STATE
-let state = JSON.parse(localStorage.getItem("marka")) || {
- balance:500,
- activity:0,
- tier:"Bronze",
- preferences:{},
- following:[],
- missions:{daily:false},
- feed:[
-  {video:"https://www.w3schools.com/html/mov_bbb.mp4",cat:"tech",likes:5,comments:[],creator:"John",followers:10},
-  {video:"https://www.w3schools.com/html/movie.mp4",cat:"life",likes:3,comments:[],creator:"Anna",followers:7}
- ]
+// ================= STATE =================
+let db = JSON.parse(localStorage.getItem("marka")) || {
+user:{balance:500,kyc:"none",strikes:0},
+ledger:[],
+feed:[
+{video:"https://www.w3schools.com/html/mov_bbb.mp4",likes:5,comments:[],creator:"Alex",views:0},
+{video:"https://www.w3schools.com/html/movie.mp4",likes:3,comments:[],creator:"Maria",views:0}
+],
+queue:[]
 };
 
-function save(){localStorage.setItem("marka",JSON.stringify(state));}
+function save(){localStorage.setItem("marka",JSON.stringify(db));}
 
-// NAV
-function nav(id){
- document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
- document.getElementById(id).classList.remove('hidden');
- if(id==="leaderboard") renderLeaderboard();
+// ================= BACKEND SIMULATION =================
+const API = {
+request(type,data){
+return new Promise(res=>{
+setTimeout(()=>{
+if(type==="PAY"){
+res(Backend.pay(data));
+}
+if(type==="KYC"){
+res(Backend.kyc(data));
+}
+},800+Math.random()*800);
+});
+}
+};
+
+const Backend = {
+
+pay(order){
+
+let platform = order.amount*0.15;
+let seller = order.amount*0.85;
+
+db.user.balance -= order.amount;
+
+db.ledger.push({
+id:crypto.randomUUID(),
+split:{platform,seller},
+time:Date.now()
+});
+
+save();
+return {ok:true};
+},
+
+kyc(data){
+if(data.bi && data.bi.length>=8){
+db.user.kyc="KYC1";
+save();
+return {ok:true};
+}
+return {ok:false};
 }
 
-// AI
-function learn(cat){
- state.preferences[cat]=(state.preferences[cat]||0)+1;
- state.activity+=5;
- updateTier();
+};
+
+// ================= NAV =================
+function nav(p){
+document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
+document.getElementById(p).classList.remove('hidden');
+
+if(p==="feed") renderFeed();
+if(p==="wallet") updateWallet();
+if(p==="leaderboard") renderBoard();
+if(p==="market") renderMarket();
 }
 
-// TIER
-function updateTier(){
- let s=state.activity;
- state.tier=s>500?"Elite":s>300?"Gold":s>150?"Silver":"Bronze";
-}
-
-// NOTIFICATION
-function notify(msg){
- let n=document.getElementById('notifications');
- n.innerText=msg;
- n.style.display="block";
- setTimeout(()=>n.style.display="none",2000);
-}
-
-// FEED
+// ================= FEED =================
 function renderFeed(){
- let el=document.getElementById('feedList');
- el.innerHTML="";
+let el=document.getElementById("feedList");
+el.innerHTML="";
 
- let vids=[...state.feed];
-
- vids.sort((a,b)=>{
-  let sa=(a.likes||0)+(a.comments?.length||0)*2;
-  let sb=(b.likes||0)+(b.comments?.length||0)*2;
-  return sb-sa;
- });
-
- vids.forEach((v,i)=>{
-  el.innerHTML+=`
-  <div style="position:relative">
-   <video src="${v.video}" autoplay muted loop onclick="view(${i})"></video>
-
-   <div class="video-overlay">
-    <button class="btn" onclick="like(${i})">❤️ ${v.likes||0}</button>
-    <button class="btn" onclick="comment(${i})">💬 ${(v.comments||[]).length}</button>
-    <button class="btn" onclick="follow(${i})">➕ Follow</button>
-   </div>
-  </div>`;
- });
-}
-
-// ACTIONS
-function view(i){
- let v=state.feed[i];
- v.views=(v.views||0)+1;
- learn(v.cat);
- save();
+db.feed.sort((a,b)=>b.likes-a.likes).forEach((v,i)=>{
+el.innerHTML+=`
+<div class="card">
+<video src="${v.video}" controls></video>
+<p>${v.creator}</p>
+<button class="btn" onclick="like(${i})">❤️ ${v.likes}</button>
+<button class="btn" onclick="comment(${i})">💬</button>
+</div>
+`;
+});
 }
 
 function like(i){
- let v=state.feed[i];
- v.likes=(v.likes||0)+1;
- state.activity+=5;
- updateTier();
- notify("Liked!");
- renderFeed();
- save();
+db.feed[i].likes++;
+save();
+renderFeed();
 }
 
 function comment(i){
- let t=prompt("Comment");
- if(!t)return;
- let v=state.feed[i];
- v.comments.push(t);
- state.activity+=8;
- notify("Comment added");
- renderFeed();
- save();
+db.feed[i].comments.push("ok");
+save();
 }
 
-function follow(i){
- let v=state.feed[i];
- if(!state.following.includes(v.creator)){
-  state.following.push(v.creator);
-  v.followers=(v.followers||0)+1;
-  state.activity+=10;
-  notify("Following "+v.creator);
- }
- save();
-}
-
-// CREATOR
+// ================= CREATOR =================
 function publish(){
- let name=document.getElementById('creatorName').value;
- let url=document.getElementById('videoUrl').value;
- let cat=document.getElementById('videoCat').value;
+let name=document.getElementById("creatorName").value;
+let url=document.getElementById("videoUrl").value;
 
- state.feed.push({
-  video:url,cat,creator:name,
-  likes:0,comments:[],followers:0
- });
+db.feed.push({video:url,creator:name,likes:0,comments:[],views:0});
 
- state.activity+=20;
- updateTier();
- notify("Published!");
- renderFeed();
- save();
+save();
+alert("Published");
 }
 
-// LEADERBOARD
-function renderLeaderboard(){
- let t=document.getElementById('trending');
- let top=document.getElementById('top');
+// ================= MARKET =================
+let products=[
+{name:"Food",price:5000},
+{name:"Freelance",price:100000}
+];
 
- let vids=[...state.feed];
- vids.sort((a,b)=>((b.likes||0)+(b.comments.length*2))-((a.likes||0)+(a.comments.length*2)));
+function renderMarket(){
+let el=document.getElementById("market");
+el.innerHTML="<h2>Market</h2>";
 
- t.innerHTML="";
- vids.slice(0,5).forEach(v=>{
-  t.innerHTML+=`<div class="card">${v.creator} - ${v.likes}❤️</div>`;
- });
-
- let creators={};
- state.feed.forEach(v=>{
-  if(!creators[v.creator]) creators[v.creator]={score:0,followers:v.followers||0};
-  creators[v.creator].score+=(v.likes||0)+(v.comments.length*2);
- });
-
- let list=Object.entries(creators).sort((a,b)=>(b[1].score+b[1].followers)-(a[1].score+a[1].followers));
-
- top.innerHTML="";
- list.slice(0,5).forEach(([name,data],i)=>{
-  top.innerHTML+=`<div class="card">#${i+1} ${name} ⭐${data.score}</div>`;
- });
+products.forEach((p,i)=>{
+el.innerHTML+=`
+<div class="card">
+<p>${p.name}</p>
+<p>${p.price}</p>
+<button class="btn" onclick="buy(${i})">Buy</button>
+</div>
+`;
+});
 }
 
-// WALLET
-function addMoney(){
- state.balance+=100;
- state.activity+=5;
- updateTier();
- updateWallet();
+async function buy(i){
+let p=products[i];
+
+let res = await API.request("PAY",{amount:p.price});
+
+if(res.ok){
+alert("Paid via backend simulation");
+}
 }
 
+// ================= KYC =================
+async function kyc(){
+let name=document.getElementById("name").value;
+let bi=document.getElementById("bi").value;
+
+let res=await API.request("KYC",{name,bi});
+
+if(res.ok){
+alert("KYC Approved");
+}else{
+alert("Rejected");
+}
+}
+
+// ================= WALLET =================
 function updateWallet(){
- document.getElementById('balance').innerText=state.balance;
- document.getElementById('score').innerText="Tier: "+state.tier+" | Score: "+state.activity;
- save();
+document.getElementById("bal").innerText=db.user.balance;
 }
 
-// INIT
-renderFeed();
+function addFunds(){
+db.user.balance+=100;
+save();
 updateWallet();
+}
+
+// ================= LEADERBOARD =================
+function renderBoard(){
+
+let el=document.getElementById("trend");
+el.innerHTML="";
+
+let sorted=[...db.feed].sort((a,b)=>b.likes-a.likes);
+
+sorted.slice(0,3).forEach(v=>{
+el.innerHTML+=`<div class="card">${v.creator} ❤️ ${v.likes}</div>`;
+});
+
+}
+
+// ================= INIT =================
+renderFeed();
 
 </script>
 
 </body>
-</html>
+ </html>
