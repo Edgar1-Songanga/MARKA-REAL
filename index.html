@@ -1,257 +1,403 @@
-<!DOCTYPE html>
-<html lang="pt">
+    <!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MARKA Global v6</title>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MARKA Global v3.1 | Autonomous Antifraude</title>
+    <meta name="description" content="The World's First Autonomous Antifraude Super-App. Ultra-premium fintech, marketplace, and social ecosystem.">
+    
+    <!-- Premium Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<style>
-:root{
---bg:#fff;--card:#f3f4f6;--text:#111;--accent:#2563eb;--border:#e5e7eb
-}
-.dark{
---bg:#09090b;--card:#18181b;--text:#fafafa;--accent:#3b82f6;--border:#27272a
-}
-body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
-.app{max-width:520px;margin:auto;padding-bottom:100px}
-header{padding:15px;display:flex;justify-content:space-between}
-.card{background:var(--card);padding:14px;border-radius:16px;margin-bottom:12px;border:1px solid var(--border)}
-.btn{width:100%;padding:12px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:600}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-nav{position:fixed;bottom:0;width:100%;max-width:520px;display:flex;background:var(--card);border-top:1px solid var(--border)}
-nav button{flex:1;border:none;background:none;padding:10px}
-input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)}
-</style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        premium: {
+                            black: '#0A0A0A',
+                            dark: '#171717',
+                            accent: '#3B82F6',
+                            gold: '#D4AF37',
+                            silver: '#C0C0C0',
+                            bronze: '#CD7F32',
+                            success: '#10B981',
+                            danger: '#EF4444',
+                            warning: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    },
+                    borderRadius: {
+                        'premium': '16px'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const blob = new Blob([`
+                    const CACHE_NAME = 'marka-v3-cache';
+                    const urlsToCache = ['/'];
+                    self.addEventListener('install', event => {
+                        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+                    });
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
+                    });
+                `], { type: 'application/javascript' });
+                const workerUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(workerUrl).catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
+
+    <style>
+        :root {
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        }
+        
+        body {
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+
+        .glass {
+            background: rgba(23, 23, 23, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light .glass {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .premium-shadow {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .active-nav {
+            color: #3B82F6;
+            transform: translateY(-2px);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #171717 25%, #262626 50%, #171717 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .video-container {
+            height: calc(100vh - 64px);
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+        }
+
+        .video-card {
+            scroll-snap-align: start;
+            height: calc(100vh - 64px);
+        }
+
+        /* Micro-interactions */
+        .btn-press:active { transform: scale(0.96); }
+        
+        /* Custom Map Simulation */
+        .map-grid {
+            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .light .map-grid {
+            background-image: radial-gradient(#ddd 1px, transparent 1px);
+        }
+    </style>
 </head>
+<body class="bg-premium-black text-white font-sans transition-colors duration-300 dark">
 
-<body class="dark">
+    <!-- App Shell -->
+    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col relative overflow-hidden bg-premium-black dark:bg-premium-black light:bg-gray-50">
+        
+        <!-- Header -->
+        <header class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-premium-accent rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <h1 class="font-display font-bold text-xl tracking-tight">MARKA <span class="text-premium-accent">v3.1</span></h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="search-trigger" class="btn-press p-2 rounded-full hover:bg-white/5 transition-colors">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
+                <button id="theme-toggle" class="btn-press p-2 rounded-full hover:bg-white/5 transition-colors">
+                    <i data-lucide="moon" id="theme-icon" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
 
-<div class="app">
-<header>
-<b>MARKA</b>
-<div id="balance"></div>
-</header>
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar pb-24">
+            <!-- Dynamic Content Injected Here -->
+        </main>
 
-<main id="view"></main>
+        <!-- Bottom Navigation -->
+        <nav class="glass fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 px-6 py-3 flex justify-between items-center border-t border-white/5">
+            <button onclick="router.navigate('home')" class="nav-item flex flex-col items-center gap-1 transition-all duration-300" data-path="home">
+                <i data-lucide="home" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-widest">Início</span>
+            </button>
+            <button onclick="router.navigate('market')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="market">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-widest">Market</span>
+            </button>
+            <button onclick="router.navigate('travel')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="travel">
+                <i data-lucide="plane" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-widest">Viagem</span>
+            </button>
+            <button onclick="router.navigate('wallet')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="wallet">
+                <i data-lucide="wallet" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-widest">Pagar</span>
+            </button>
+            <button onclick="router.navigate('profile')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="profile">
+                <i data-lucide="user" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-widest">Eu</span>
+            </button>
+        </nav>
 
-<nav>
-<button onclick="App.nav('home')">🏠</button>
-<button onclick="App.nav('market')">🛍️</button>
-<button onclick="App.nav('services')">💼</button>
-<button onclick="App.nav('feed')">🎥</button>
-<button onclick="App.nav('wallet')">💳</button>
-</nav>
-</div>
+        <!-- Command Palette (CMD+K) -->
+        <div id="command-palette" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-start justify-center pt-20 px-4">
+            <div class="w-full max-w-sm glass rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <div class="p-4 border-b border-white/10 flex items-center gap-3">
+                    <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                    <input type="text" id="cmd-input" placeholder="Search anything..." class="bg-transparent border-none outline-none w-full text-lg">
+                </div>
+                <div id="cmd-results" class="max-h-64 overflow-y-auto p-2">
+                    <!-- Results -->
+                </div>
+            </div>
+        </div>
 
-<script type="module">
+        <!-- Global Notifications -->
+        <div id="notification-container" class="fixed top-20 left-0 right-0 z-[110] px-4 pointer-events-none"></div>
+    </div>
 
-// ================= STORE =================
-const Store = (()=>{
+    <!-- Templates & Scripts -->
+    <script type="module">
+        // --- Core State Management (Zustand-like) ---
+        const createStore = (initialState) => {
+            let state = initialState;
+            const listeners = new Set();
+            return {
+                getState: () => state,
+                setState: (fn) => {
+                    state = typeof fn === 'function' ? fn(state) : fn;
+                    listeners.forEach(l => l(state));
+                },
+                subscribe: (l) => {
+                    listeners.add(l);
+                    return () => listeners.delete(l);
+                }
+            };
+        };
 
-let s = JSON.parse(localStorage.getItem("marka_v6")||"null");
+        const store = createStore({
+            user: JSON.parse(localStorage.getItem('marka_user')) || {
+                id: 'u1',
+                handle: 'premium_user',
+                balance: 150000,
+                xp: 1250,
+                tier: 'Gold',
+                kyc: 'Yellow',
+                interactions: {},
+                streak: 5
+            },
+            cart: [],
+            notifications: [],
+            theme: localStorage.getItem('marka_theme') || 'dark',
+            lang: 'pt',
+            view: 'home'
+        });
 
-if(!s){
-s={
-view:"home",
-user:{name:"Alex",balance:25000,kyc:"KYC1",strikes:0},
-users:[
-{id:"u1",name:"Carlos",score:300},
-{id:"u2",name:"Ana",score:120},
-{id:"u3",name:"João UX",score:500}
-],
-products:[
-{id:"p1",type:"car",name:"Toyota Prado",price:20000000,seller:"u1"},
-{id:"p2",type:"food",name:"Pizza",price:5000,seller:"u2"}
-],
-services:[
-{id:"s1",name:"UI Design",price:120000,user:"u3"}
-],
-feed:[
-{user:"Ana",likes:4},
-{user:"Carlos",likes:2}
-],
-chat:[],
-escrow:[],
-ledger:[],
-queue:[]
-};
-}
+        // --- Internationalization ---
+        const i18n = {
+            pt: {
+                welcome: "Bem-vindo de volta",
+                balance: "Saldo Disponível",
+                market: "Mercado",
+                travel: "Viagens",
+                wallet: "Carteira",
+                profile: "Perfil",
+                kyc_status: "Status de Verificação",
+                search_placeholder: "Pesquisar produtos, serviços...",
+                pay_now: "Pagar Agora",
+                add_funds: "Adicionar Fundos"
+            },
+            en: {
+                welcome: "Welcome back",
+                balance: "Available Balance",
+                market: "Marketplace",
+                travel: "Travel",
+                wallet: "Wallet",
+                profile: "Profile",
+                kyc_status: "Verification Status",
+                search_placeholder: "Search products, services...",
+                pay_now: "Pay Now",
+                add_funds: "Add Funds"
+            }
+        };
 
-function set(fn){
-fn(s);
-localStorage.setItem("marka_v6",JSON.stringify(s));
-render();
-}
+        // --- Router ---
+        const router = {
+            navigate: (view) => {
+                store.setState(s => ({ ...s, view }));
+                render();
+                window.scrollTo(0, 0);
+            }
+        };
+        window.router = router;
 
-function get(){return s;}
+        // --- UI Components ---
+        const Components = {
+            BalanceCard: (state) => `
+                <div class="px-6 py-4">
+                    <div class="glass rounded-premium p-6 premium-shadow relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <i data-lucide="landmark" class="w-24 h-24"></i>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">${i18n[state.lang].balance}</p>
+                        <h2 class="text-3xl font-bold font-display mb-4">${state.user.balance.toLocaleString()} Kz</h2>
+                        <div class="flex gap-3">
+                            <button onclick="actions.addFunds()" class="btn-press flex-1 bg-white text-black rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> ${i18n[state.lang].add_funds}
+                            </button>
+                            <button onclick="router.navigate('wallet')" class="btn-press flex-1 bg-premium-accent text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i> Enviar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            ModuleGrid: () => `
+                <div class="px-6 py-4 grid grid-cols-4 gap-4">
+                    ${[
+                        { id: 'market', icon: 'shopping-bag', label: 'Market', color: 'bg-blue-500' },
+                        { id: 'transport', icon: 'car', label: 'Uber', color: 'bg-black' },
+                        { id: 'food', icon: 'utensils', label: 'Food', color: 'bg-orange-500' },
+                        { id: 'freelance', icon: 'briefcase', label: 'Jobs', color: 'bg-green-500' },
+                        { id: 'travel', icon: 'plane', label: 'Travel', color: 'bg-purple-500' },
+                        { id: 'bills', icon: 'zap', label: 'Bills', color: 'bg-yellow-500' },
+                        { id: 'clothing', icon: 'shirt', label: 'Fashion', color: 'bg-pink-500' },
+                        { id: 'more', icon: 'grid', label: 'Mais', color: 'bg-gray-500' }
+                    ].map(m => `
+                        <button onclick="router.navigate('${m.id}')" class="btn-press flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 ${m.color} rounded-2xl flex items-center justify-center shadow-lg">
+                                <i data-lucide="${m.icon}" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">${m.label}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `,
 
-return{get,set};
-})();
+            SocialFeed: () => `
+                <div class="px-6 py-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display font-bold text-lg">Tendências</h3>
+                        <button class="text-premium-accent text-sm font-bold">Ver tudo</button>
+                    </div>
+                    <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+                        ${[1,2,3,4].map(i => `
+                            <div class="flex-shrink-0 w-32 h-48 rounded-2xl bg-premium-dark relative overflow-hidden border border-white/5">
+                                <img src="https://picsum.photos/seed/${i+20}/200/300" class="w-full h-full object-cover opacity-60">
+                                <div class="absolute bottom-0 left-0 p-3 w-full bg-gradient-to-t from-black/80 to-transparent">
+                                    <p class="text-[10px] font-bold truncate">@creator_${i}</p>
+                                    <div class="flex items-center gap-1 mt-1">
+                                        <i data-lucide="heart" class="w-3 h-3 text-red-500 fill-red-500"></i>
+                                        <span class="text-[8px]">${(Math.random()*10).toFixed(1)}k</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
 
-// ================= FRAUD =================
-const Fraud={
-check(msg){
-let rules=[/\d{9,}/,/@/,/http/i,/whatsapp/i];
-if(rules.some(r=>r.test(msg))){
-Store.set(s=>{
-s.user.strikes++;
-s.queue.push({msg,type:"LEAK"});
-});
-return true;
-}
-return false;
-}
-};
+            Marketplace: () => `
+                <div class="px-6 py-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-display font-bold text-lg">Marketplace</h3>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-premium-accent/10 text-premium-accent rounded-full text-[10px] font-bold">Tudo</span>
+                            <span class="px-3 py-1 bg-white/5 text-gray-400 rounded-full text-[10px] font-bold">Carros</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${[
+                            { title: 'iPhone 15 Pro', price: '850.000', img: 'https://picsum.photos/seed/iphone/400/400' },
+                            { title: 'Toyota Hilux 2023', price: '24.500.000', img: 'https://picsum.photos/seed/car/400/400' },
+                            { title: 'Apartamento T3', price: '45.000.000', img: 'https://picsum.photos/seed/house/400/400' },
+                            { title: 'MacBook M3 Max', price: '1.200.000', img: 'https://picsum.photos/seed/mac/400/400' }
+                        ].map(p => `
+                            <div class="glass rounded-2xl overflow-hidden border border-white/5">
+                                <div class="h-32 bg-premium-dark relative">
+                                    <img src="${p.img}" class="w-full h-full object-cover">
+                                    <button class="absolute top-2 right-2 p-1.5 bg-black/50 backdrop-blur-md rounded-full">
+                                        <i data-lucide="heart" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <div class="p-3">
+                                    <h4 class="text-xs font-bold truncate">${p.title}</h4>
+                                    <p class="text-premium-accent font-bold text-sm mt-1">${p.price} Kz</p>
+                                    <button onclick="actions.addToCart('${p.title}')" class="w-full mt-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold transition-colors">
+                                        Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
 
-// ================= ESCROW =================
-const Escrow={
-create(amount,seller){
-Store.set(s=>{
-s.user.balance-=amount;
-s.escrow.push({
-id:crypto.randomUUID(),
-amount,seller,status:"HOLD"
-});
-});
-alert("Escrow ativo");
-},
-release(id){
-Store.set(s=>{
-let tx=s.escrow.find(x=>x.id===id);
-if(!tx)return;
-let fee=tx.amount*0.1;
-s.ledger.push({amount:tx.amount-fee});
-tx.status="DONE";
-});
-alert("Pagamento libertado");
-}
-};
-
-// ================= HELPERS =================
-const H={
-user(id){return Store.get().users.find(u=>u.id===id)},
-userCard(u){
-return `<div class="card"><b>${u.name}</b><p>Score ${u.score}</p></div>`;
-}
-};
-
-// ================= UI =================
-const UI={
-
-home(s){
-return `
-<div class="card">Olá ${s.user.name}<br>${s.user.balance} Kz</div>
-
-<div class="grid">
-<div class="card" onclick="App.nav('market')">Marketplace</div>
-<div class="card" onclick="App.nav('services')">Freelance</div>
-<div class="card" onclick="App.nav('feed')">Feed</div>
-<div class="card" onclick="App.nav('ranking')">Ranking</div>
-<div class="card" onclick="App.nav('chat')">Chat</div>
-</div>`;
-},
-
-market(s){
-return s.products.map(p=>{
-let u=H.user(p.seller);
-return `<div class="card">
-<b>${p.name}</b>
-<p>${p.price.toLocaleString()} Kz</p>
-${H.userCard(u)}
-<button class="btn" onclick="App.buy('${p.id}')">Comprar</button>
-</div>`;
-}).join("");
-},
-
-services(s){
-return s.services.map(x=>{
-let u=H.user(x.user);
-return `<div class="card">
-<b>${x.name}</b>
-<p>${x.price}</p>
-${H.userCard(u)}
-<button class="btn" onclick="App.propose('${x.id}')">Propor</button>
-</div>`;
-}).join("");
-},
-
-feed(s){
-return s.feed.map((f,i)=>`
-<div class="card">
-${f.user}
-<button class="btn" onclick="App.like(${i})">❤️ ${f.likes}</button>
-</div>`).join("");
-},
-
-chat(s){
-return `
-<div class="card">${s.chat.map(m=>`<p>${m}</p>`).join("")}</div>
-<input id="msg">
-<button class="btn" onclick="App.send()">Enviar</button>`;
-},
-
-wallet(s){
-return `
-<div class="card">${s.user.balance} Kz</div>
-<button class="btn" onclick="App.add()">+1000</button>`;
-},
-
-ranking(s){
-return s.users.sort((a,b)=>b.score-a.score)
-.map(u=>`<div class="card">${u.name} ${u.score}</div>`).join("");
-}
-
-};
-
-// ================= APP =================
-window.App={
-
-nav(v){Store.set(s=>s.view=v)},
-
-buy(id){
-let s=Store.get();
-let p=s.products.find(x=>x.id===id);
-if(s.user.balance<p.price)return alert("Saldo insuficiente");
-Escrow.create(p.price,p.seller);
-},
-
-propose(id){
-alert("Proposta enviada");
-},
-
-send(){
-let msg=document.getElementById("msg").value;
-if(Fraud.check(msg)) return alert("Mensagem bloqueada");
-Store.set(s=>s.chat.push(msg));
-},
-
-add(){
-Store.set(s=>s.user.balance+=1000);
-},
-
-like(i){
-Store.set(s=>{
-s.feed[i].likes++;
-s.users[0].score+=2;
-});
-}
-
-};
-
-// ================= RENDER =================
-function render(){
-let s=Store.get();
-document.getElementById("balance").innerText=s.user.balance+" Kz";
-
-let html = UI[s.view] ? UI[s.view](s) : UI.home(s);
-
-document.getElementById("view").innerHTML=html;
-}
-
-// INIT
-render();
-
-</script>
-
-</body>
-</html>
+            TransportView: () => `
+                <div class="h-[calc(100vh-160px)] flex flex-col">
+                    <div class="flex-1 bg-premium-dark relative map-grid">
+                        <!-- Fake Map UI -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="relative">
+                                <div class="w-12 h-12 bg-premium-accent/20 rounded-full animate-ping absolute -inset-0"></div>
+                                <div class="w-12 h-12 bg-premium-accent rounded-full flex items-center justify-center relative shadow-2xl">
+                                    <i data-lucide="navigation" class="w-6 h-6 t
