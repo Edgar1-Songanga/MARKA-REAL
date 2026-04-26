@@ -1,19 +1,15 @@
-    <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MARKA Global v3.1 | Autonomous Antifraude</title>
-    <meta name="description" content="The World's First Autonomous Antifraude Super-App. Ultra-premium fintech, marketplace, and social ecosystem.">
+    <title>MARKA | Autonomous Super-App</title>
     
-    <!-- Premium Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Premium Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -22,382 +18,324 @@
                 extend: {
                     colors: {
                         premium: {
-                            black: '#0A0A0A',
-                            dark: '#171717',
+                            black: '#050505',
+                            dark: '#0F0F0F',
+                            card: '#161616',
                             accent: '#3B82F6',
-                            gold: '#D4AF37',
-                            silver: '#C0C0C0',
-                            bronze: '#CD7F32',
-                            success: '#10B981',
-                            danger: '#EF4444',
-                            warning: '#F59E0B'
+                            gold: '#D4AF37'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
                         display: ['Outfit', 'sans-serif']
-                    },
-                    borderRadius: {
-                        'premium': '16px'
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        }
                     }
                 }
             }
         }
     </script>
 
-    <script>
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const blob = new Blob([`
-                    const CACHE_NAME = 'marka-v3-cache';
-                    const urlsToCache = ['/'];
-                    self.addEventListener('install', event => {
-                        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
-                    });
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
-                    });
-                `], { type: 'application/javascript' });
-                const workerUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(workerUrl).catch(err => console.log('SW failed', err));
-            });
-        }
-    </script>
-
     <style>
-        :root {
-            --safe-area-inset-bottom: env(safe-area-inset-bottom);
-        }
-        
-        body {
-            -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: contain;
-            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-        }
-
-        .glass {
-            background: rgba(23, 23, 23, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .light .glass {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .premium-shadow {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-        }
-
+        body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
+        .glass { background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .light .glass { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 0, 0, 0.05); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .active-nav {
-            color: #3B82F6;
-            transform: translateY(-2px);
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, #171717 25%, #262626 50%, #171717 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-        }
-
-        @keyframes skeleton-loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .video-container {
-            height: calc(100vh - 64px);
-            scroll-snap-type: y mandatory;
-            overflow-y: scroll;
-        }
-
-        .video-card {
-            scroll-snap-align: start;
-            height: calc(100vh - 64px);
-        }
-
-        /* Micro-interactions */
-        .btn-press:active { transform: scale(0.96); }
-        
-        /* Custom Map Simulation */
-        .map-grid {
-            background-image: radial-gradient(#333 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .light .map-grid {
-            background-image: radial-gradient(#ddd 1px, transparent 1px);
-        }
+        .active-nav { color: #3B82F6; transform: translateY(-2px); }
+        .btn-press:active { transform: scale(0.95); }
+        .map-bg { background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 </head>
-<body class="bg-premium-black text-white font-sans transition-colors duration-300 dark">
+<body class="bg-premium-black text-white font-sans transition-colors duration-500 dark">
 
-    <!-- App Shell -->
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col relative overflow-hidden bg-premium-black dark:bg-premium-black light:bg-gray-50">
+    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col relative bg-premium-black dark:bg-premium-black light:bg-gray-50 overflow-hidden">
         
-        <!-- Header -->
-        <header class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-premium-accent rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
-                </div>
-                <h1 class="font-display font-bold text-xl tracking-tight">MARKA <span class="text-premium-accent">v3.1</span></h1>
+        <!-- Centered Header -->
+        <header class="glass sticky top-0 z-50 px-6 py-5 flex justify-between items-center">
+            <button id="theme-toggle" class="btn-press p-2 rounded-full hover:bg-white/5">
+                <i data-lucide="moon" id="theme-icon" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="absolute left-1/2 -translate-x-1/2">
+                <h1 class="font-display font-extrabold text-2xl tracking-[0.2em] text-white dark:text-white light:text-black">MARKA</h1>
             </div>
-            <div class="flex items-center gap-4">
-                <button id="search-trigger" class="btn-press p-2 rounded-full hover:bg-white/5 transition-colors">
-                    <i data-lucide="search" class="w-5 h-5"></i>
-                </button>
-                <button id="theme-toggle" class="btn-press p-2 rounded-full hover:bg-white/5 transition-colors">
-                    <i data-lucide="moon" id="theme-icon" class="w-5 h-5"></i>
-                </button>
-            </div>
+
+            <button id="search-trigger" class="btn-press p-2 rounded-full hover:bg-white/5">
+                <i data-lucide="search" class="w-5 h-5"></i>
+            </button>
         </header>
 
-        <!-- Main Content Area -->
-        <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar pb-24">
-            <!-- Dynamic Content Injected Here -->
+        <!-- Dynamic Content -->
+        <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar pb-32">
+            <!-- Content injected by JS -->
         </main>
 
-        <!-- Bottom Navigation -->
-        <nav class="glass fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 px-6 py-3 flex justify-between items-center border-t border-white/5">
-            <button onclick="router.navigate('home')" class="nav-item flex flex-col items-center gap-1 transition-all duration-300" data-path="home">
+        <!-- Bottom Nav -->
+        <nav class="glass fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 px-8 py-4 flex justify-between items-center border-t border-white/5">
+            <button onclick="router.navigate('home')" class="nav-item flex flex-col items-center gap-1" data-path="home">
                 <i data-lucide="home" class="w-6 h-6"></i>
-                <span class="text-[10px] font-medium uppercase tracking-widest">Início</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Início</span>
             </button>
-            <button onclick="router.navigate('market')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="market">
+            <button onclick="router.navigate('market')" class="nav-item flex flex-col items-center gap-1 text-gray-500" data-path="market">
                 <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                <span class="text-[10px] font-medium uppercase tracking-widest">Market</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Market</span>
             </button>
-            <button onclick="router.navigate('travel')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="travel">
-                <i data-lucide="plane" class="w-6 h-6"></i>
-                <span class="text-[10px] font-medium uppercase tracking-widest">Viagem</span>
-            </button>
-            <button onclick="router.navigate('wallet')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="wallet">
+            <button onclick="router.navigate('wallet')" class="nav-item flex flex-col items-center gap-1 text-gray-500" data-path="wallet">
                 <i data-lucide="wallet" class="w-6 h-6"></i>
-                <span class="text-[10px] font-medium uppercase tracking-widest">Pagar</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Pagar</span>
             </button>
-            <button onclick="router.navigate('profile')" class="nav-item flex flex-col items-center gap-1 text-gray-500 transition-all duration-300" data-path="profile">
+            <button onclick="router.navigate('profile')" class="nav-item flex flex-col items-center gap-1 text-gray-500" data-path="profile">
                 <i data-lucide="user" class="w-6 h-6"></i>
-                <span class="text-[10px] font-medium uppercase tracking-widest">Eu</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Eu</span>
             </button>
         </nav>
 
-        <!-- Command Palette (CMD+K) -->
-        <div id="command-palette" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-start justify-center pt-20 px-4">
-            <div class="w-full max-w-sm glass rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <div class="p-4 border-b border-white/10 flex items-center gap-3">
-                    <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
-                    <input type="text" id="cmd-input" placeholder="Search anything..." class="bg-transparent border-none outline-none w-full text-lg">
-                </div>
-                <div id="cmd-results" class="max-h-64 overflow-y-auto p-2">
-                    <!-- Results -->
-                </div>
+        <!-- Global Modal Container -->
+        <div id="modal-container" class="fixed inset-0 z-[100] hidden">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="ui.closeModal()"></div>
+            <div id="modal-content" class="absolute bottom-0 left-0 right-0 max-w-md mx-auto glass rounded-t-[32px] p-8 animate-slide-up">
+                <!-- Modal content -->
             </div>
         </div>
 
-        <!-- Global Notifications -->
-        <div id="notification-container" class="fixed top-20 left-0 right-0 z-[110] px-4 pointer-events-none"></div>
+        <!-- Notification Toast -->
+        <div id="toast-container" class="fixed top-24 left-0 right-0 z-[110] px-6 pointer-events-none"></div>
     </div>
 
-    <!-- Templates & Scripts -->
     <script type="module">
-        // --- Core State Management (Zustand-like) ---
-        const createStore = (initialState) => {
-            let state = initialState;
-            const listeners = new Set();
-            return {
-                getState: () => state,
-                setState: (fn) => {
-                    state = typeof fn === 'function' ? fn(state) : fn;
-                    listeners.forEach(l => l(state));
-                },
-                subscribe: (l) => {
-                    listeners.add(l);
-                    return () => listeners.delete(l);
-                }
-            };
-        };
-
-        const store = createStore({
-            user: JSON.parse(localStorage.getItem('marka_user')) || {
-                id: 'u1',
-                handle: 'premium_user',
-                balance: 150000,
-                xp: 1250,
-                tier: 'Gold',
-                kyc: 'Yellow',
-                interactions: {},
-                streak: 5
-            },
+        // --- State Management ---
+        const state = {
+            user: { balance: 250000, xp: 1500, tier: 'Elite', kyc: 'Gold', streak: 7 },
             cart: [],
-            notifications: [],
-            theme: localStorage.getItem('marka_theme') || 'dark',
-            lang: 'pt',
-            view: 'home'
-        });
-
-        // --- Internationalization ---
-        const i18n = {
-            pt: {
-                welcome: "Bem-vindo de volta",
-                balance: "Saldo Disponível",
-                market: "Mercado",
-                travel: "Viagens",
-                wallet: "Carteira",
-                profile: "Perfil",
-                kyc_status: "Status de Verificação",
-                search_placeholder: "Pesquisar produtos, serviços...",
-                pay_now: "Pagar Agora",
-                add_funds: "Adicionar Fundos"
-            },
-            en: {
-                welcome: "Welcome back",
-                balance: "Available Balance",
-                market: "Marketplace",
-                travel: "Travel",
-                wallet: "Wallet",
-                profile: "Profile",
-                kyc_status: "Verification Status",
-                search_placeholder: "Search products, services...",
-                pay_now: "Pay Now",
-                add_funds: "Add Funds"
-            }
+            view: 'home',
+            theme: 'dark',
+            products: [
+                { id: 1, title: 'iPhone 15 Pro Max', price: 950000, img: 'https://picsum.photos/seed/p1/400/400', cat: 'Tech' },
+                { id: 2, title: 'Mercedes G63 AMG', price: 85000000, img: 'https://picsum.photos/seed/p2/400/400', cat: 'Auto' },
+                { id: 3, title: 'Penthouse Luanda', price: 120000000, img: 'https://picsum.photos/seed/p3/400/400', cat: 'Real Estate' },
+                { id: 4, title: 'Rolex Submariner', price: 12500000, img: 'https://picsum.photos/seed/p4/400/400', cat: 'Luxury' }
+            ],
+            faqs: [
+                { q: "O que é a MARKA?", a: "A MARKA é um super-app autónomo que integra marketplace, pagamentos, transporte e serviços numa única plataforma segura." },
+                { q: "Como funciona o Anti-Fraude?", a: "Utilizamos IA para monitorizar transações em tempo real, bloqueando comportamentos suspeitos e garantindo que o seu dinheiro está seguro em escrow." },
+                { q: "Como posso carregar a carteira?", a: "Pode carregar via Multicaixa Express, transferência bancária ou depósito direto nos nossos agentes parceiros." }
+            ]
         };
 
         // --- Router ---
-        const router = {
+        window.router = {
             navigate: (view) => {
-                store.setState(s => ({ ...s, view }));
+                state.view = view;
                 render();
                 window.scrollTo(0, 0);
             }
         };
-        window.router = router;
 
-        // --- UI Components ---
-        const Components = {
-            BalanceCard: (state) => `
-                <div class="px-6 py-4">
-                    <div class="glass rounded-premium p-6 premium-shadow relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 opacity-10">
-                            <i data-lucide="landmark" class="w-24 h-24"></i>
+        // --- UI Logic ---
+        window.ui = {
+            openModal: (content) => {
+                const container = document.getElementById('modal-container');
+                const inner = document.getElementById('modal-content');
+                inner.innerHTML = content;
+                container.classList.remove('hidden');
+                lucide.createIcons();
+            },
+            closeModal: () => {
+                document.getElementById('modal-container').classList.add('hidden');
+            },
+            notify: (msg, type = 'success') => {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `glass p-4 rounded-2xl mb-3 shadow-2xl border-l-4 ${type === 'success' ? 'border-green-500' : 'border-blue-500'} flex items-center gap-3 animate-slide-up pointer-events-auto`;
+                toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5 ${type === 'success' ? 'text-green-500' : 'text-blue-500'}"></i><p class="text-sm font-bold">${msg}</p>`;
+                container.appendChild(toast);
+                lucide.createIcons();
+                setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+            },
+            toggleTheme: () => {
+                state.theme = state.theme === 'dark' ? 'light' : 'dark';
+                document.body.classList.toggle('dark', state.theme === 'dark');
+                document.body.classList.toggle('light', state.theme === 'light');
+                document.getElementById('theme-icon').setAttribute('data-lucide', state.theme === 'dark' ? 'moon' : 'sun');
+                lucide.createIcons();
+            }
+        };
+
+        // --- Actions ---
+        window.actions = {
+            buyProduct: (id) => {
+                const p = state.products.find(x => x.id === id);
+                if (state.user.balance >= p.price) {
+                    ui.openModal(`
+                        <div class="text-center">
+                            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="shield-check" class="w-10 h-10 text-green-500"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Confirmar Compra</h3>
+                            <p class="text-gray-400 text-sm mb-6">O valor de <b>${p.price.toLocaleString()} Kz</b> será retido em Escrow até à entrega.</p>
+                            <button onclick="actions.confirmPurchase(${id})" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Pagar Agora</button>
                         </div>
-                        <p class="text-gray-400 text-sm font-medium mb-1">${i18n[state.lang].balance}</p>
-                        <h2 class="text-3xl font-bold font-display mb-4">${state.user.balance.toLocaleString()} Kz</h2>
+                    `);
+                } else {
+                    ui.notify('Saldo insuficiente', 'error');
+                }
+            },
+            confirmPurchase: (id) => {
+                const p = state.products.find(x => x.id === id);
+                state.user.balance -= p.price;
+                ui.closeModal();
+                ui.notify('Pagamento processado! Produto em trânsito.');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                render();
+            },
+            addFunds: () => {
+                ui.openModal(`
+                    <h3 class="text-xl font-bold mb-6">Adicionar Fundos</h3>
+                    <div class="space-y-4">
+                        <input type="number" id="fund-amount" placeholder="Valor em Kz" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-premium-accent">
+                        <button onclick="actions.processDeposit()" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Gerar Referência</button>
+                    </div>
+                `);
+            },
+            processDeposit: () => {
+                const amt = parseInt(document.getElementById('fund-amount').value) || 0;
+                state.user.balance += amt;
+                ui.closeModal();
+                ui.notify(`+${amt.toLocaleString()} Kz adicionados!`);
+                render();
+            }
+        };
+
+        // --- Dynamic Data ---
+        const data = {
+            restaurants: [
+                { id: 1, name: 'KFC Luanda', rating: 4.8, time: '20-30 min', img: 'https://picsum.photos/seed/kfc/800/400' },
+                { id: 2, name: 'Pizzaria Veneza', rating: 4.5, time: '35-45 min', img: 'https://picsum.photos/seed/pizza/800/400' },
+                { id: 3, name: 'Churrascaria Premium', rating: 4.9, time: '25-35 min', img: 'https://picsum.photos/seed/bbq/800/400' }
+            ],
+            jobs: [
+                { id: 1, title: 'UI/UX Designer', budget: 250000, proposals: 12 },
+                { id: 2, title: 'Dev React Native', budget: 500000, proposals: 8 },
+                { id: 3, title: 'Copywriter Português', budget: 150000, proposals: 5 }
+            ],
+            flights: [
+                { id: 1, from: 'LAD', to: 'LIS', price: 450000, time: '6h 30m' },
+                { id: 2, from: 'LAD', to: 'NYC', price: 850000, time: '10h 15m' },
+                { id: 3, from: 'LAD', to: 'JNB', price: 280000, time: '3h 45m' }
+            ],
+            utilities: [
+                { id: 1, name: 'ENDE', icon: 'zap', color: 'bg-yellow-500' },
+                { id: 2, name: 'EPAL', icon: 'droplet', color: 'bg-blue-500' },
+                { id: 3, name: 'ZAP', icon: 'tv', color: 'bg-orange-500' },
+                { id: 4, name: 'UNITEL', icon: 'phone', color: 'bg-orange-600' }
+            ]
+        };
+
+        // --- Views ---
+        const Views = {
+            home: () => `
+                <div class="px-6 py-4">
+                    <div class="glass p-8 rounded-[32px] mb-8 relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-premium-accent/10 rounded-full blur-3xl"></div>
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Saldo Total</p>
+                        <h2 class="text-4xl font-display font-bold mb-6">${state.user.balance.toLocaleString()} Kz</h2>
                         <div class="flex gap-3">
-                            <button onclick="actions.addFunds()" class="btn-press flex-1 bg-white text-black rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2">
-                                <i data-lucide="plus-circle" class="w-4 h-4"></i> ${i18n[state.lang].add_funds}
-                            </button>
-                            <button onclick="router.navigate('wallet')" class="btn-press flex-1 bg-premium-accent text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2">
-                                <i data-lucide="send" class="w-4 h-4"></i> Enviar
-                            </button>
+                            <button onclick="actions.addFunds()" class="flex-1 py-3 bg-white text-black rounded-xl font-bold text-xs btn-press">CARREGAR</button>
+                            <button onclick="router.navigate('wallet')" class="flex-1 py-3 bg-premium-accent text-white rounded-xl font-bold text-xs btn-press">ENVIAR</button>
                         </div>
                     </div>
-                </div>
-            `,
-            
-            ModuleGrid: () => `
-                <div class="px-6 py-4 grid grid-cols-4 gap-4">
-                    ${[
-                        { id: 'market', icon: 'shopping-bag', label: 'Market', color: 'bg-blue-500' },
-                        { id: 'transport', icon: 'car', label: 'Uber', color: 'bg-black' },
-                        { id: 'food', icon: 'utensils', label: 'Food', color: 'bg-orange-500' },
-                        { id: 'freelance', icon: 'briefcase', label: 'Jobs', color: 'bg-green-500' },
-                        { id: 'travel', icon: 'plane', label: 'Travel', color: 'bg-purple-500' },
-                        { id: 'bills', icon: 'zap', label: 'Bills', color: 'bg-yellow-500' },
-                        { id: 'clothing', icon: 'shirt', label: 'Fashion', color: 'bg-pink-500' },
-                        { id: 'more', icon: 'grid', label: 'Mais', color: 'bg-gray-500' }
-                    ].map(m => `
-                        <button onclick="router.navigate('${m.id}')" class="btn-press flex flex-col items-center gap-2">
-                            <div class="w-12 h-12 ${m.color} rounded-2xl flex items-center justify-center shadow-lg">
-                                <i data-lucide="${m.icon}" class="w-6 h-6 text-white"></i>
-                            </div>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">${m.label}</span>
-                        </button>
-                    `).join('')}
-                </div>
-            `,
 
-            SocialFeed: () => `
-                <div class="px-6 py-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-display font-bold text-lg">Tendências</h3>
-                        <button class="text-premium-accent text-sm font-bold">Ver tudo</button>
-                    </div>
-                    <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4">
-                        ${[1,2,3,4].map(i => `
-                            <div class="flex-shrink-0 w-32 h-48 rounded-2xl bg-premium-dark relative overflow-hidden border border-white/5">
-                                <img src="https://picsum.photos/seed/${i+20}/200/300" class="w-full h-full object-cover opacity-60">
-                                <div class="absolute bottom-0 left-0 p-3 w-full bg-gradient-to-t from-black/80 to-transparent">
-                                    <p class="text-[10px] font-bold truncate">@creator_${i}</p>
-                                    <div class="flex items-center gap-1 mt-1">
-                                        <i data-lucide="heart" class="w-3 h-3 text-red-500 fill-red-500"></i>
-                                        <span class="text-[8px]">${(Math.random()*10).toFixed(1)}k</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `,
-
-            Marketplace: () => `
-                <div class="px-6 py-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-display font-bold text-lg">Marketplace</h3>
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-premium-accent/10 text-premium-accent rounded-full text-[10px] font-bold">Tudo</span>
-                            <span class="px-3 py-1 bg-white/5 text-gray-400 rounded-full text-[10px] font-bold">Carros</span>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-4 gap-4 mb-8">
                         ${[
-                            { title: 'iPhone 15 Pro', price: '850.000', img: 'https://picsum.photos/seed/iphone/400/400' },
-                            { title: 'Toyota Hilux 2023', price: '24.500.000', img: 'https://picsum.photos/seed/car/400/400' },
-                            { title: 'Apartamento T3', price: '45.000.000', img: 'https://picsum.photos/seed/house/400/400' },
-                            { title: 'MacBook M3 Max', price: '1.200.000', img: 'https://picsum.photos/seed/mac/400/400' }
-                        ].map(p => `
-                            <div class="glass rounded-2xl overflow-hidden border border-white/5">
-                                <div class="h-32 bg-premium-dark relative">
-                                    <img src="${p.img}" class="w-full h-full object-cover">
-                                    <button class="absolute top-2 right-2 p-1.5 bg-black/50 backdrop-blur-md rounded-full">
-                                        <i data-lucide="heart" class="w-3.5 h-3.5"></i>
-                                    </button>
+                            { id: 'market', icon: 'shopping-bag', label: 'Market' },
+                            { id: 'transport', icon: 'car', label: 'Uber' },
+                            { id: 'food', icon: 'utensils', label: 'Food' },
+                            { id: 'travel', icon: 'plane', label: 'Viagem' }
+                        ].map(m => `
+                            <button onclick="router.navigate('${m.id}')" class="flex flex-col items-center gap-2 btn-press">
+                                <div class="w-14 h-14 glass rounded-2xl flex items-center justify-center shadow-xl">
+                                    <i data-lucide="${m.icon}" class="w-6 h-6"></i>
                                 </div>
-                                <div class="p-3">
+                                <span class="text-[10px] font-bold text-gray-500 uppercase">${m.label}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <h3 class="font-display font-bold text-xl mb-4">Destaques</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${state.products.map(p => `
+                            <div class="glass rounded-3xl overflow-hidden border border-white/5 btn-press" onclick="actions.buyProduct(${p.id})">
+                                <img src="${p.img}" class="w-full h-32 object-cover">
+                                <div class="p-4">
                                     <h4 class="text-xs font-bold truncate">${p.title}</h4>
-                                    <p class="text-premium-accent font-bold text-sm mt-1">${p.price} Kz</p>
-                                    <button onclick="actions.addToCart('${p.title}')" class="w-full mt-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-[10px] font-bold transition-colors">
-                                        Adicionar
-                                    </button>
+                                    <p class="text-premium-accent font-bold text-sm mt-1">${p.price.toLocaleString()} Kz</p>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
                 </div>
             `,
-
-            TransportView: () => `
-                <div class="h-[calc(100vh-160px)] flex flex-col">
-                    <div class="flex-1 bg-premium-dark relative map-grid">
-                        <!-- Fake Map UI -->
+            market: () => `
+                <div class="px-6 py-4">
+                    <h2 class="text-2xl font-display font-bold mb-6">Marketplace</h2>
+                    <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar">
+                        ${['Todos', 'Tech', 'Auto', 'Imóveis', 'Moda'].map(c => `
+                            <span class="px-5 py-2 glass rounded-full text-xs font-bold whitespace-nowrap">${c}</span>
+                        `).join('')}
+                    </div>
+                    <div class="space-y-4">
+                        ${state.products.map(p => `
+                            <div class="glass p-4 rounded-3xl flex gap-4 items-center border border-white/5 btn-press" onclick="actions.buyProduct(${p.id})">
+                                <img src="${p.img}" class="w-20 h-20 rounded-2xl object-cover">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm">${p.title}</h4>
+                                    <p class="text-premium-accent font-bold text-sm">${p.price.toLocaleString()} Kz</p>
+                                    <p class="text-[10px] text-gray-500 mt-1">Vendedor Verificado</p>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-gray-700"></i>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `,
+            transport: () => `
+                <div class="h-[calc(100vh-200px)] flex flex-col">
+                    <div class="flex-1 map-bg relative">
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="relative">
-                                <div class="w-12 h-12 bg-premium-accent/20 rounded-full animate-ping absolute -inset-0"></div>
-                                <div class="w-12 h-12 bg-premium-accent rounded-full flex items-center justify-center relative shadow-2xl">
-                                    <i data-lucide="navigation" class="w-6 h-6 t
+                            <div class="w-16 h-16 bg-premium-accent/20 rounded-full animate-ping"></div>
+                            <div class="w-4 h-4 bg-premium-accent rounded-full absolute shadow-[0_0_20px_rgba(59,130,246,0.8)]"></div>
+                        </div>
+                    </div>
+                    <div class="glass p-8 rounded-t-[40px] -mt-10 relative z-10">
+                        <h3 class="text-xl font-bold mb-6">Para onde vamos?</h3>
+                        <div class="space-y-3 mb-6">
+                            <div class="p-4 bg-white/5 rounded-2xl flex items-center gap-3">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-green-500"></i>
+                                <input type="text" placeholder="Localização atual" class="bg-transparent outline-none text-sm w-full">
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-2xl flex items-center gap-3">
+                                <i data-lucide="navigation" class="w-4 h-4 text-premium-accent"></i>
+                                <input type="text" placeholder="Destino" class="bg-transparent outline-none text-sm w-full">
+                            </div>
+                        </div>
+                        <button onclick="ui.notify('A procurar motoristas...')" class="w-full py-4 bg-premium-accent rounded-2xl font-bold btn-press">Pedir Marka</button>
+                    </div>
+                </div>
+            `,
+            wallet: () => `
+                <div class="px-6 py-4">
+                    <h2 class="text-2xl font-display font-bold mb-6">Minha Carteira</h2>
+                    <div class="glass p-8 rounded-[32px] bg-gradient-to-br from-premium-accent to-blue-800 mb-8">
+                        <p class="text-white/60 text-xs font-bold uppercase mb-1">Disponível</p>
+                        <h2 class="text-4xl font-display font-bold text-white">${state.user.balance.toLocaleString()} Kz</h2>
+                    </div>
+                    <h3 class="font-bold mb-4">Transações</h3>
+                    <div class="space-y-3">
+                        ${[1,2,3].map(i => `
+                            <div class="glass p-4 rounded-2xl flex justify-between items-center border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="arrow-down-left" class="w-5 h-5 text-green-500"></i>
+                                    </div>
+                                    <div>
+                                
