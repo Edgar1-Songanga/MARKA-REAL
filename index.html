@@ -1,272 +1,255 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MARKA </title>
+<title>MARKA Global v6</title>
 
 <style>
-:root{--bg:#0a0a0a;--card:#171717;--text:#fff;--accent:#3B82F6}
-.light{--bg:#f5f5f5;--card:#fff;--text:#000}
-body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text)}
-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:var(--card);padding:10px}
-nav button{background:none;border:none;color:var(--text);font-size:12px}
-.container{padding:15px;padding-bottom:90px}
-.card{background:var(--card);padding:12px;border-radius:12px;margin-bottom:10px}
-.btn{width:100%;padding:10px;border:none;border-radius:10px;background:var(--accent);color:#fff;margin-top:8px}
-.hidden{display:none}
-input{width:100%;padding:10px;margin-top:8px;border-radius:10px;border:none;background:#111;color:#fff}
-.light input{background:#eee;color:#000}
-.badge{padding:3px 8px;border-radius:20px;font-size:11px}
-.green{background:#16a34a}.yellow{background:#eab308}.red{background:#ef4444}
+:root{
+--bg:#fff;--card:#f3f4f6;--text:#111;--accent:#2563eb;--border:#e5e7eb
+}
+.dark{
+--bg:#09090b;--card:#18181b;--text:#fafafa;--accent:#3b82f6;--border:#27272a
+}
+body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+.app{max-width:520px;margin:auto;padding-bottom:100px}
+header{padding:15px;display:flex;justify-content:space-between}
+.card{background:var(--card);padding:14px;border-radius:16px;margin-bottom:12px;border:1px solid var(--border)}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+nav{position:fixed;bottom:0;width:100%;max-width:520px;display:flex;background:var(--card);border-top:1px solid var(--border)}
+nav button{flex:1;border:none;background:none;padding:10px}
+input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)}
 </style>
 </head>
 
-<body>
+<body class="dark">
 
-<div class="container">
+<div class="app">
+<header>
+<b>MARKA</b>
+<div id="balance"></div>
+</header>
 
-<div id="feed"></div>
-<div id="market" class="hidden"></div>
-<div id="users" class="hidden"></div>
-
-<div id="kyc" class="hidden">
-<h3>KYC</h3>
-<input id="bi" placeholder="BI">
-<button class="btn" onclick="kyc()">Submit</button>
-</div>
-
-<div id="wallet" class="hidden">
-<h3 id="walletTitle"></h3>
-<p id="balance"></p>
-<button class="btn" onclick="addFunds()">+100</button>
-</div>
-
-<div id="settings" class="hidden">
-<select onchange="setLang(this.value)">
-<option value="en">EN</option>
-<option value="pt">PT</option>
-<option value="os">OS</option>
-</select>
-<button class="btn" onclick="toggleTheme()">Theme</button>
-</div>
-
-<div id="admin" class="hidden">
-<h3>ADMIN PANEL</h3>
-<div id="queue"></div>
-</div>
-
-</div>
+<main id="view"></main>
 
 <nav>
-<button onclick="nav('feed')">Feed</button>
-<button onclick="nav('market')">Market</button>
-<button onclick="nav('users')">Users</button>
-<button onclick="nav('kyc')">KYC</button>
-<button onclick="nav('wallet')">Wallet</button>
-<button onclick="nav('settings')">⚙</button>
+<button onclick="App.nav('home')">🏠</button>
+<button onclick="App.nav('market')">🛍️</button>
+<button onclick="App.nav('services')">💼</button>
+<button onclick="App.nav('feed')">🎥</button>
+<button onclick="App.nav('wallet')">💳</button>
 </nav>
+</div>
 
-<script>
+<script type="module">
 
-// ================= DB =================
-let db = JSON.parse(localStorage.getItem("marka")) || {
-user:{balance:500,kyc:"none",strikes:0,lang:"en",theme:"dark"},
-ledger:[],
-queue:[],
-feed:[
-{video:"https://www.w3schools.com/html/mov_bbb.mp4",likes:3,creator:"Alex"},
-{video:"https://www.w3schools.com/html/movie.mp4",likes:2,creator:"Maria"}
+// ================= STORE =================
+const Store = (()=>{
+
+let s = JSON.parse(localStorage.getItem("marka_v6")||"null");
+
+if(!s){
+s={
+view:"home",
+user:{name:"Alex",balance:25000,kyc:"KYC1",strikes:0},
+users:[
+{id:"u1",name:"Carlos",score:300},
+{id:"u2",name:"Ana",score:120},
+{id:"u3",name:"João UX",score:500}
 ],
-users:[],
-products:[]
+products:[
+{id:"p1",type:"car",name:"Toyota Prado",price:20000000,seller:"u1"},
+{id:"p2",type:"food",name:"Pizza",price:5000,seller:"u2"}
+],
+services:[
+{id:"s1",name:"UI Design",price:120000,user:"u3"}
+],
+feed:[
+{user:"Ana",likes:4},
+{user:"Carlos",likes:2}
+],
+chat:[],
+escrow:[],
+ledger:[],
+queue:[]
 };
-
-// ================= INIT USERS =================
-if(db.users.length===0){
-db.users=[
-{id:"u1",name:"Carlos Mendes",role:"buyer",headline:"Empresário",tier:"Gold",kyc:"KYC2"},
-{id:"u2",name:"Ana Silva",role:"seller",headline:"Moda Luanda",tier:"Silver",kyc:"KYC2"},
-{id:"u3",name:"João UX",role:"freelancer",headline:"UI/UX Designer",tier:"Elite",kyc:"KYC2",skills:["Figma","UX"]},
-{id:"u4",name:"ImoPrime",role:"seller",headline:"Imobiliária",tier:"Gold",kyc:"KYB"}
-];
 }
 
-// ================= INIT PRODUCTS =================
-if(db.products.length===0){
-db.products=[
-{id:"p1",type:"food",name:"Pizza",price:5000,sellerId:"u2"},
-{id:"p2",type:"car",name:"Land Cruiser",price:25000000,sellerId:"u4"},
-{id:"p3",type:"realestate",name:"T3 Talatona",price:85000000,sellerId:"u4"},
-{id:"p4",type:"freelance",name:"UI Design",price:120000,sellerId:"u3"},
-{id:"p5",type:"service",name:"Consultoria",price:50000,sellerId:"u3"}
-];
+function set(fn){
+fn(s);
+localStorage.setItem("marka_v6",JSON.stringify(s));
+render();
 }
 
-function save(){localStorage.setItem("marka",JSON.stringify(db));}
+function get(){return s;}
 
-// ================= LANG =================
-const LANG={
-en:{wallet:"Wallet",kyc:"Approved"},
-pt:{wallet:"Carteira",kyc:"Aprovado"},
-os:{wallet:"Omboloto",kyc:"Yatya"}
-};
-function t(k){return LANG[db.user.lang][k]||k;}
-function setLang(l){db.user.lang=l;save();updateWallet();}
-
-// ================= THEME =================
-function toggleTheme(){
-document.body.classList.toggle("light");
-db.user.theme=document.body.classList.contains("light")?"light":"dark";
-save();
-}
-
-// ================= NAV =================
-function nav(id){
-if(id==="admin"){
-let pass=prompt("Password");
-if(pass!=="marka2026"){alert("Denied");return;}
-}
-document.querySelectorAll('.container>div').forEach(d=>d.classList.add('hidden'));
-document.getElementById(id).classList.remove('hidden');
-
-if(id==="feed")renderFeed();
-if(id==="market")renderMarket();
-if(id==="wallet")updateWallet();
-if(id==="users")renderUsers();
-if(id==="admin")renderQueue();
-}
-
-// ================= USER CARD =================
-function getUser(id){return db.users.find(u=>u.id===id);}
-
-function userCard(u){
-let badge=u.kyc==="KYC2"?"green":u.kyc==="KYC1"?"yellow":"red";
-return `
-<div class="card">
-<h4>${u.name} <span class="badge ${badge}">${u.kyc}</span></h4>
-<p>${u.headline}</p>
-<p>Tier: ${u.tier}</p>
-${u.skills?`<p>${u.skills.join(", ")}</p>`:""}
-</div>`;
-}
-
-// ================= USERS =================
-function renderUsers(){
-let el=document.getElementById("users");
-el.innerHTML="<h3>Perfis</h3>";
-db.users.forEach(u=>{el.innerHTML+=userCard(u);});
-}
-
-// ================= FEED =================
-function renderFeed(){
-let el=document.getElementById("feed");
-el.innerHTML="<h3>Feed</h3>";
-
-db.feed.forEach((v,i)=>{
-el.innerHTML+=`
-<div class="card">
-<video src="${v.video}" controls></video>
-<p>${v.creator}</p>
-<button class="btn" onclick="like(${i})">❤️ ${v.likes}</button>
-<button class="btn" onclick="comment(${i})">💬</button>
-</div>`;
-});
-}
-
-function like(i){db.feed[i].likes++;save();renderFeed();}
-
-function comment(i){
-let msg=prompt("Comment");
-if(fraudCheck(msg)){alert("Blocked");return;}
-db.feed[i].comments=(db.feed[i].comments||[]);
-db.feed[i].comments.push(msg);
-save();
-}
+return{get,set};
+})();
 
 // ================= FRAUD =================
-function fraudCheck(msg){
-if(!msg)return false;
-let patterns=[/\d{9,}/,/@/,/whatsapp/i,/telegram/i,/http/i];
-for(let p of patterns){
-if(p.test(msg)){
-db.user.strikes++;
-db.queue.push({type:"LEAK",msg,status:"AI_REVIEW"});
-save();
+const Fraud={
+check(msg){
+let rules=[/\d{9,}/,/@/,/http/i,/whatsapp/i];
+if(rules.some(r=>r.test(msg))){
+Store.set(s=>{
+s.user.strikes++;
+s.queue.push({msg,type:"LEAK"});
+});
 return true;
-}
 }
 return false;
 }
+};
 
-// ================= MARKET =================
-function renderMarket(){
-let el=document.getElementById("market");
-el.innerHTML="<h3>Marketplace</h3>";
+// ================= ESCROW =================
+const Escrow={
+create(amount,seller){
+Store.set(s=>{
+s.user.balance-=amount;
+s.escrow.push({
+id:crypto.randomUUID(),
+amount,seller,status:"HOLD"
+});
+});
+alert("Escrow ativo");
+},
+release(id){
+Store.set(s=>{
+let tx=s.escrow.find(x=>x.id===id);
+if(!tx)return;
+let fee=tx.amount*0.1;
+s.ledger.push({amount:tx.amount-fee});
+tx.status="DONE";
+});
+alert("Pagamento libertado");
+}
+};
 
-db.products.forEach((p,i)=>{
-let seller=getUser(p.sellerId);
+// ================= HELPERS =================
+const H={
+user(id){return Store.get().users.find(u=>u.id===id)},
+userCard(u){
+return `<div class="card"><b>${u.name}</b><p>Score ${u.score}</p></div>`;
+}
+};
 
-el.innerHTML+=`
-<div class="card">
-<h4>${p.name}</h4>
-<p>${p.price} Kz</p>
-<p>${p.type}</p>
-${userCard(seller)}
-<button class="btn" onclick="buy(${i})">Comprar</button>
+// ================= UI =================
+const UI={
+
+home(s){
+return `
+<div class="card">Olá ${s.user.name}<br>${s.user.balance} Kz</div>
+
+<div class="grid">
+<div class="card" onclick="App.nav('market')">Marketplace</div>
+<div class="card" onclick="App.nav('services')">Freelance</div>
+<div class="card" onclick="App.nav('feed')">Feed</div>
+<div class="card" onclick="App.nav('ranking')">Ranking</div>
+<div class="card" onclick="App.nav('chat')">Chat</div>
 </div>`;
+},
+
+market(s){
+return s.products.map(p=>{
+let u=H.user(p.seller);
+return `<div class="card">
+<b>${p.name}</b>
+<p>${p.price.toLocaleString()} Kz</p>
+${H.userCard(u)}
+<button class="btn" onclick="App.buy('${p.id}')">Comprar</button>
+</div>`;
+}).join("");
+},
+
+services(s){
+return s.services.map(x=>{
+let u=H.user(x.user);
+return `<div class="card">
+<b>${x.name}</b>
+<p>${x.price}</p>
+${H.userCard(u)}
+<button class="btn" onclick="App.propose('${x.id}')">Propor</button>
+</div>`;
+}).join("");
+},
+
+feed(s){
+return s.feed.map((f,i)=>`
+<div class="card">
+${f.user}
+<button class="btn" onclick="App.like(${i})">❤️ ${f.likes}</button>
+</div>`).join("");
+},
+
+chat(s){
+return `
+<div class="card">${s.chat.map(m=>`<p>${m}</p>`).join("")}</div>
+<input id="msg">
+<button class="btn" onclick="App.send()">Enviar</button>`;
+},
+
+wallet(s){
+return `
+<div class="card">${s.user.balance} Kz</div>
+<button class="btn" onclick="App.add()">+1000</button>`;
+},
+
+ranking(s){
+return s.users.sort((a,b)=>b.score-a.score)
+.map(u=>`<div class="card">${u.name} ${u.score}</div>`).join("");
+}
+
+};
+
+// ================= APP =================
+window.App={
+
+nav(v){Store.set(s=>s.view=v)},
+
+buy(id){
+let s=Store.get();
+let p=s.products.find(x=>x.id===id);
+if(s.user.balance<p.price)return alert("Saldo insuficiente");
+Escrow.create(p.price,p.seller);
+},
+
+propose(id){
+alert("Proposta enviada");
+},
+
+send(){
+let msg=document.getElementById("msg").value;
+if(Fraud.check(msg)) return alert("Mensagem bloqueada");
+Store.set(s=>s.chat.push(msg));
+},
+
+add(){
+Store.set(s=>s.user.balance+=1000);
+},
+
+like(i){
+Store.set(s=>{
+s.feed[i].likes++;
+s.users[0].score+=2;
 });
 }
 
-// ================= PAYMENT =================
-async function buy(i){
-let p=db.products[i];
-await new Promise(r=>setTimeout(r,600));
+};
 
-let platform=p.price*0.15;
-let seller=p.price*0.85;
+// ================= RENDER =================
+function render(){
+let s=Store.get();
+document.getElementById("balance").innerText=s.user.balance+" Kz";
 
-db.user.balance-=p.price;
+let html = UI[s.view] ? UI[s.view](s) : UI.home(s);
 
-db.ledger.push({
-txId:crypto.randomUUID(),
-split:{platform,seller},
-time:Date.now()
-});
-
-save();
-alert("Pagamento feito (escrow simulado)");
+document.getElementById("view").innerHTML=html;
 }
 
-// ================= KYC =================
-function kyc(){
-let bi=document.getElementById("bi").value;
-if(bi.length<6){alert("Invalid");return;}
-db.user.kyc="KYC1";
-save();
-alert(t("kyc"));
-}
-
-// ================= WALLET =================
-function updateWallet(){
-document.getElementById("walletTitle").innerText=t("wallet");
-document.getElementById("balance").innerText=db.user.balance+" Kz";
-}
-function addFunds(){db.user.balance+=100;save();updateWallet();}
-
-// ================= ADMIN =================
-function renderQueue(){
-let el=document.getElementById("queue");
-el.innerHTML="";
-db.queue.forEach(q=>{
-el.innerHTML+=`<div class="card"><p>${q.type}</p><p>${q.msg}</p></div>`;
-});
-}
-
-// ================= INIT =================
-renderFeed();
-updateWallet();
-if(db.user.theme==="light")document.body.classList.add("light");
+// INIT
+render();
 
 </script>
 
